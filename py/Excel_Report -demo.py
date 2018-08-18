@@ -67,7 +67,7 @@ class Excel_Report():
 		ws.column_dimensions['I'].width=25
 		for i in range(1,51):
 			ws.row_dimensions[i].height=15
-		#添加表格线条
+		#添加表格线条，
 		thin = Side(border_style="thin", color="000000")
 		border = Border(left=thin, right=thin, top=thin, bottom=thin)
 		for i in ['A','B','C','D','E','F','G','H','I']:
