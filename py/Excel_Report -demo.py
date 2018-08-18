@@ -204,7 +204,7 @@ class Excel_Report():
 		self.log_name=self.log_addr+'\\'+self.report_time+'-log.txt'
 		file=open(self.log_name,'w')
 		for i in suite:
-			if '.txt' in i.getAttribute('source'):
+			if '.txt' in i.getAttribute('source') or '.robot' in i.getAttribute('source') or '.tsv' in i.getAttribute('source') or'.html' in i.getAttribute('source'):
 				suite_name=i.getAttribute('name')#得到集合的名字
 				suit_message.append(suite_name)
 				suit_status=i.getElementsByTagName('status')
