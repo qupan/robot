@@ -228,7 +228,7 @@ class Excel_Report():
 							tag.append(k.firstChild.data)#把所有标签加入tag空列表中
 						tag=','.join(tag)#将所有的标签链接在一起
 						file.write(tag+s)#写入tag名称
-					elif len(tags)==0:
+					elif len(tags)<=0:
 						file.write(u'空'+s)
 
 					#输入数据一栏
@@ -282,6 +282,8 @@ class Excel_Report():
 		row_num=range(3,3+len(data))
 		for i in range(len(data)):
 			case_list=data[i].replace('\n','').split('::')
+			if '' in case_list:
+				case_list.remove('')
 			column=['A','B','C','D','E','F','G','H','I','J']
 			for j in range(len(column)):
 				if case_list[j]=='PASS':
