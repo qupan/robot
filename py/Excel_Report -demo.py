@@ -1,4 +1,3 @@
-
 #coding=utf-8
 import xml.etree.ElementTree as ET
 import xml.dom.minidom
@@ -57,7 +56,7 @@ class Excel_Report():
 			ws.merge_cells('B%d:C%d'%(i,i))
 		#更改行高和列宽
 		ws.column_dimensions['A'].width=5
-		ws.column_dimensions['B'].width=12
+		ws.column_dimensions['B'].width=15
 		ws.column_dimensions['C'].width=18
 		ws.column_dimensions['D'].width=25
 		ws.column_dimensions['E'].width=15
@@ -233,11 +232,16 @@ class Excel_Report():
 
 					#输入数据一栏
 					input_message=j.getElementsByTagName('kw')
+					input_data=[]
 					for i in input_message:
 						if i.getAttribute('name')=='Input Text':
 							msg=i.getElementsByTagName('msg')
 							text=msg[0].firstChild.data
 							file.write(text.split(' ')[2][1:-1]+',')
+						else:
+							input_data.append(u'空')
+					if len(input_data) !=0:
+						file.write(u'未得到结果')
 					file.write(s)
 
 					#得到实际结果和预期结果
@@ -336,4 +340,4 @@ class Excel_Report():
 		file.close()
 
 if __name__=="__main__":
-	Excel_Report(u'project').write_excel()
+	Excel_Report(u'International_B2B').write_excel()
