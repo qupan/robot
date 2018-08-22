@@ -1,7 +1,8 @@
 #-*- coding:utf-8 -*-
+from Read_Oracle import Read_Oracle
 import xlrd,time,datetime
 
-class My_Keyword(Read_Oracle):
+class My_Keyword():
 
 	def read_excel(self,addr):
 		'''
@@ -92,7 +93,22 @@ class My_Keyword(Read_Oracle):
 		else:
 			print ('error')
 
+	def convert_dict(self,message):
+		'''
+		输入入参数据，将数据装换成字典
+		输入格式为：page=1,Size=4
+		'''
+		list_message=[]
+		x=message.split(',')
+		for i in range(len(x)):
+			y=x[i].split('=')
+			z=tuple(y)
+			list_message.append(z)
+		dict_message=dict(list_message)
+		return dict_message
+
+
 
 if __name__ == '__main__':
-	y=My_Keyword().read_excel('C:\\Users\\elead21.hik\\Desktop\\Project\\000-Deomo\\data\\01.xlsx')
-	print(len(y))
+	x=My_Keyword().convert_dict('page=1,Size=4')
+	print(x)
