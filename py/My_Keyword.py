@@ -1,6 +1,6 @@
 #-*- coding:utf-8 -*-
 from Read_Oracle import Read_Oracle
-import xlrd,time,datetime
+import xlrd,time,datetime,json
 
 class My_Keyword():
 
@@ -105,10 +105,11 @@ class My_Keyword():
 			z=tuple(y)
 			list_message.append(z)
 		dict_message=dict(list_message)
-		return dict_message
+		json_dict_message=json.dumps(dict_message,encoding="UTF-8",ensure_ascii=False)
+		return json_dict_message
 
 
 
 if __name__ == '__main__':
-	x=My_Keyword().convert_dict('page=1,Size=4')
+	x=My_Keyword().convert_dict('page=看见看见,Size=4')
 	print(x)
