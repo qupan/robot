@@ -163,7 +163,7 @@ class Excel_Report():
 
 	def total_time(self):
 		#得到运行总时间
-		driver=webdriver.Ie()
+		driver=webdriver.Chrome()
 		driver.get(self.html_addr)
 		time.sleep(3)
 		try:
@@ -186,9 +186,13 @@ class Excel_Report():
 			message.append(project)
 			#print(message)
 			driver.close()
+			os.system('taskkill /f /im geckodriver.exe')
+			os.system('taskkill /f /im chromedriver.exe')
 			os.system('taskkill /f /im IEDriverServer.exe')
 		except Exception as e:
 			driver.close()
+			os.system('taskkill /f /im geckodriver.exe')
+			os.system('taskkill /f /im chromedriver.exe')
 			os.system('taskkill /f /im IEDriverServer.exe')
 		return message
 
@@ -340,4 +344,4 @@ class Excel_Report():
 		file.close()
 
 if __name__=="__main__":
-	Excel_Report(u'International_B2B').write_excel()
+	Excel_Report(u'Project').write_excel()
