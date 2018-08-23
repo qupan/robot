@@ -242,9 +242,13 @@ class Excel_Report():
 							msg=i.getElementsByTagName('msg')
 							text=msg[0].firstChild.data
 							file.write(text.split(' ')[2][1:-1]+',')
+						elif i.getAttribute('name')=='Convert Dict':
+							msg=i.getElementsByTagName('msg')
+							text=msg[0].firstChild.data
+							file.write(text[12:38]+',')
 						else:
 							input_data.append(u'空')
-					if len(input_data) !=0:
+					if len(input_data) == len(input_message):
 						file.write(u'未得到结果')
 					file.write(s)
 
