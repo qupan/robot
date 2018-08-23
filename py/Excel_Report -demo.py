@@ -298,12 +298,12 @@ class Excel_Report():
 				case_list.remove('')
 			column=['A','B','C','D','E','F','G','H','I','J']
 			for j in range(len(column)):
-				if case_list[j]=='PASS':
+				if 'PASS' in case_list[j]:
 					ws2[column[j] + str(row_num[i])].fill=PatternFill(patternType='solid',start_color='339966')
-					ws2[column[j] + str(row_num[i])] = case_list[j]
-				elif case_list[j]=='FAIL':
+					ws2[column[j] + str(row_num[i])] = 'PASS'
+				elif 'FAIL' in case_list[j]:
 					ws2[column[j] + str(row_num[i])].fill = PatternFill(patternType='solid', start_color='FF0000')
-					ws2[column[j] + str(row_num[i])] = case_list[j]
+					ws2[column[j] + str(row_num[i])] = 'FAIL'
 				else:
 					ws2[column[j] + str(row_num[i])] = case_list[j]
 
