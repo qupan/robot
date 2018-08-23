@@ -272,7 +272,7 @@ class Excel_Report():
 					if case_status=='FAIL':
 						Fail_message=x[-1].firstChild.data#如果是失败的用例，得到失败的信息
 						#print(Fail_message)
-						file.write(Fail_message+s)
+						file.write(Fail_message.replace('\n',',')+s)
 					elif case_status=='PASS':
 						file.write(u'无' + s)#如果是通过的用例写入空格
 
