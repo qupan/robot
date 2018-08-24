@@ -245,7 +245,7 @@ class Excel_Report():
 						elif i.getAttribute('name')=='Convert Dict':
 							msg=i.getElementsByTagName('msg')
 							text=msg[0].firstChild.data
-							file.write(text[12:38]+',')
+							file.write(text[12:len(text)]+',')
 						else:
 							input_data.append(u'空')
 					if len(input_data) == len(input_message):
@@ -260,7 +260,7 @@ class Excel_Report():
 							#第一个是得到的信息，是实际结果，第二个是输入的信息，是预期结果
 							x=i.getElementsByTagName('msg')
 							y=x[0].firstChild.data
-							file.write(y+s)#写入实际结果和预期结果
+							file.write(y.replace('\n',',')+s)#写入实际结果和预期结果
 						else:
 							Log.append(u'未得到结果')
 					if len(Log)==len(kw):#判断是否得到的预期结果和实际结果，未得到就是脚本问题
