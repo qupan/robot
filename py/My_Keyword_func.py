@@ -96,15 +96,21 @@ def convert_dict(message):
 	输入格式为：page=1,Size=4
 	'''
 	list_message=[]
-	x=message.split(',')
-	for i in range(len(x)):
-		y=x[i].split('=')
-		z=tuple(y)
-		list_message.append(z)
-	dict_message=dict(list_message)
-	json_dict_message=json.dumps(dict_message,encoding="UTF-8",ensure_ascii=False)
-	return json_dict_message
+	if ',' in message:
+		x=message.split(',')
+		for i in range(len(x)):
+			y=x[i].split('=')
+			z=tuple(y)
+			list_message.append(z)
+		dict_message=dict(list_message)
+		#json_dict_message=json.dumps(dict_message,encoding="UTF-8",ensure_ascii=False)
+	elif '=' in message:
+		x=message.split('=')
+		y=tuple(x)
+		list_message.append(y)
+		dict_message=dict(list_message)
+	return dict_message
 
 if __name__ == '__main__':
-	x=convert_dict('page=看见看见,Size=4')
+	x=convert_dict('Content-Type=application/x-www-form-urlencoded')
 	print(x)
