@@ -20,6 +20,7 @@ xlrd
 xlwt
 yagmail
 demjson
+lettuce
 Flask
 Flask-APScheduler
 Flask-Login
