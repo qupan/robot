@@ -1,5 +1,6 @@
 #-*- coding:utf-8 -*-
 import xlrd,time,datetime,json
+import ast
 
 def read_excel(addr):
 	'''
@@ -96,8 +97,8 @@ def convert_dict(message):
 	输入格式为：page=1,Size=4
 	'''
 	list_message=[]
-	if ',' in message:
-		x=message.split(',')
+	if '&' in message:
+		x=message.split('&')
 		for i in range(len(x)):
 			y=x[i].split('=')
 			z=tuple(y)
@@ -111,6 +112,19 @@ def convert_dict(message):
 		dict_message=dict(list_message)
 	return dict_message
 
+def json_dict(json_str):
+    '''
+    输入json字符串转换成字典
+    并返回
+    '''
+    json_data=json.dumps(json_str,encoding='UTF-8',ensure_ascii=False)
+    json_dict=json.loads(json_data)
+    return json_dict
+
+def assert_equal(self,actual_code,except_code,actual_data,except_data,):
+	except_data=ast.literal_eval(except_data)
+	self.assertEqual(str(actual_code), str(except_code))#判断返回码是否正确
+	self.assertEqual(actual_data, except_data)  #判断返回数据是否正确
+
 if __name__ == '__main__':
-	x=convert_dict('Content-Type=application/x-www-form-urlencoded')
-	print(x)
+	print('ok')
