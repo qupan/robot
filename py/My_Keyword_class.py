@@ -1,5 +1,4 @@
 #-*- coding:utf-8 -*-
-from Read_Oracle import Read_Oracle
 import xlrd,time,datetime,json
 
 class My_Keyword():
