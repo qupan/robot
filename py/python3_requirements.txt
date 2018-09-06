@@ -1,5 +1,7 @@
 requests
 selenium
+pytest
+splinter
 Appium-Python-Client
 robotframework
 robotframework-appiumlibrary
