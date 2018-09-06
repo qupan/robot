@@ -2,6 +2,7 @@ requests
 selenium
 pytest
 pytest-html
+pytest-allure-adaptor
 splinter
 Appium-Python-Client
 robotframework
