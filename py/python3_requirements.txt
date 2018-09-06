@@ -1,6 +1,7 @@
 requests
 selenium
 pytest
+pytest-html
 splinter
 Appium-Python-Client
 robotframework
