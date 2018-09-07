@@ -30,6 +30,7 @@ Flask-Script
 Flask-SSLify
 Flask-HTTPAuth
 Flask-RESTful
+Flask-Mail
 Werkzeug
 APScheduler
 python_dateutil
