@@ -10,6 +10,8 @@ robotframework-ride
 robotframework-seleniumlibrary
 robotFramework-selenium2library
 robotframework-sshlibrary
+robotframework-excellibrary
+robotfixml
 beautifulsoup4
 openpyxl
 PyMySQL
