@@ -1,0 +1,54 @@
+*** Settings ***
+Suite Setup       run keywords    读取excel数据    接口数据
+...               AND    新会话    ${data[1][1]}
+Suite Teardown    关闭所有会话
+Resource          ../../word/基础关键字.txt
+
+*** Variables ***
+*** Test Cases ***
+001
+    ${params}    入参数据转换    ${data[3][9]}
+    ${resp}    Get Request    api    ${data[3][5]}    params=${params}
+    接口数据检查点    ${resp}    ${data[3][8]}    ${data[3][10]}    ${data[3][11]}
+
+002
+    ${params}    入参数据转换    ${data[4][9]}
+    ${resp}    Get Request    api    ${data[4][5]}    params=${params}
+    接口数据检查点    ${resp}    ${data[4][8]}    ${data[4][10]}    ${data[4][11]}
+    \    mou
+003
+    ${headers}    入参数据转换    ${data[5][7]}
+    ${input_data}    入参数据转换    ${data[5][9]}
+    ${resp}    post request    api    ${data[5][5]}    data=${input_data}    headers=${headers}
+    接口数据检查点    ${resp}    ${data[5][8]}    ${data[5][10]}    ${data[5][11]}
+
+004
+    ${params}    入参数据转换    ${data[6][9]}
+    ${resp}    Get Request    api    ${data[6][5]}    params=${params}
+    接口数据检查点    ${resp}    ${data[6][8]}    ${data[6][10]}    ${data[6][11]}
+
+005
+    create session    api_01    http://hrpi.hikvision.com.cn.tst/
+    ${params}    入参数据转换    ${data[7][9]}
+    ${resp}    Get Request    api_01    ${data[7][5]}    params=${params}
+    接口数据检查点    ${resp}    ${data[7][8]}    ${data[7][10]}    ${data[7][11]}
+
+006
+    ${headers}    入参数据转换    ${data[8][7]}
+    ${input_data}    入参数据转换    ${data[8][9]}
+    ${resp}    post request    api    ${data[8][5]}    data=${input_data}    headers=${headers}
+    接口数据检查点    ${resp}    ${data[8][8]}    ${data[8][10]}    ${data[8][11]}
+
+007
+    ${auth}    Create List    WST_USER    88075998
+    ${headers}    入参数据转换    ${data[9][7]}
+    ${input_data}    入参数据转换    ${data[9][9]}
+    Create Session    api_02    http://sapwsd50.sapdns.cn:8350    auth=${auth}
+    ${resp}    Post Request    api_02    ${data[9][5]}    data=${input_data}    headers=${headers}
+    接口数据检查点    ${resp}    ${data[9][8]}    ${data[9][10]}    ${data[9][11]}
+
+008
+    ${headers}    入参数据转换    ${data[10][7]}
+    ${input_data}    入参数据转换    ${data[10][9]}
+    ${resp}    post request    api    ${data[10][5]}    data=${input_data}    headers=${headers}
+    接口数据检查点    ${resp}    ${data[10][8]}    ${data[10][10]}    ${data[10][11]}
