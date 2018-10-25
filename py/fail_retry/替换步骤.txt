@@ -1,0 +1,12 @@
+原地址：记得把-X换成-a，脚本原本就有-X
+https://www.cnblogs.com/baihuitestsoftware/articles/5923411.html
+
+直接替换以下文件
+
+1、python2.7\Lib\site-packages\robot\run.py
+
+2、python2.7\Lib\site-packages\robot\conf\settings.py
+
+3、python2.7\Lib\site-packages\robot\model\itemlist.py
+
+4、python2.7\Lib\site-packages\robotide\contrib\testrunner\usages.py
