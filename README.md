@@ -9,3 +9,6 @@ https://www.jianshu.com/p/ba30ed33076a
 
 phantonjs下载地址
 http://phantomjs.org/download.html
+
+失败用例重新跑3次，记得把-X改成-a，因为本身是有呢X的
+https://www.cnblogs.com/baihuitestsoftware/articles/5923411.html
