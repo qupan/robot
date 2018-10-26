@@ -12,3 +12,7 @@ http://phantomjs.org/download.html
 
 失败用例重新跑3次，记得把-X改成-a，因为本身是有呢X的
 https://www.cnblogs.com/baihuitestsoftware/articles/5923411.html
+
+
+xpath详细学习
+http://www.cnblogs.com/ktgu/archive/2009/04/16/1353246.html
