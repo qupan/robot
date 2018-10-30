@@ -1,7 +1,8 @@
 #-*- coding:utf-8 -*-
 import xlrd,time,datetime,json
+from selenium import webdriver
 
-class My_Keyword():
+class MyKeyword:
 
 	def read_excel(self,addr):
 		'''
@@ -107,6 +108,24 @@ class My_Keyword():
 		json_dict_message=json.dumps(dict_message,encoding="UTF-8",ensure_ascii=False)
 		return json_dict_message
 
+	#web模式
+	def create_headlesschrome_options(self):
+		chorme_options=webdriver.ChromeOptions()
+		chorme_options.add_argument('--headless')
+		chorme_options.add_argument('--disable-gpu')
+		chorme_options.add_argument('--window-size=1920,1080')
+		return	chorme_options
+
+	#H5模式
+	def create_app_headlesschrome_options(self,deviceName='Mei Zu'):
+		devname={'deviceName':deviceName}
+		chorme_options=webdriver.ChromeOptions()
+		chorme_options.add_argument('--headless')
+		chorme_options.add_argument('disable-gpu')
+		#chrome_options.add_argument('--deviceName=iPhone 5/SE')
+		chrome_options.add_experimental_option('mobileEmulation',devname)
+		# chrome_options.add_argument('--window-size=1920,1080')
+		return chrome_options
 
 
 if __name__ == '__main__':
