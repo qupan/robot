@@ -109,6 +109,7 @@ class MyKeyword:
 		return json_dict_message
 
 	#web模式
+	#https://www.jianshu.com/p/c4eddd8fa552
 	def create_headlesschrome_options(self):
 		chorme_options=webdriver.ChromeOptions()
 		chorme_options.add_argument('--headless')
