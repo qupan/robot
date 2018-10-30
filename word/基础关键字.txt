@@ -14,44 +14,50 @@ Library           Process
 Library           Dialogs
 Library           Screenshot
 Library           Telnet
-Resource          project_message.txt
-Library           ../py/My_Keyword.py
+Library           SudsLibrary
+Library           MyKeyword.py
 
 *** Keywords ***
+谷歌后台浏览器
+    [Arguments]    ${url}
+    ${options}    MyKeyword.Create Headlesschrome Options
+    Create Webdriver    Chrome    chrome_options=${options}
+    Maximize Browser Window
+    Go To    ${url}
+    reload page
+
 退出驱动
-    #evaluate    os.system('taskkill /f /im firefox.exe')    os
-    evaluate    os.system('taskkill /f /im chrome.exe')    os
-    evaluate    os.system('taskkill /f /im iexplore.exe')    os
-    #运行用例前，关闭所有的 浏览器（ie，火狐，谷歌）
+    [Documentation]    运行完毕后关闭浏览器 的驱动 （ie和谷歌）
+    关闭所有浏览器
     evaluate    os.system('taskkill /f /im IEDriverServer.exe')    os
     evaluate    os.system('taskkill /f /im chromedriver.exe')    os
     evaluate    os.system('taskkill /f /im geckodriver.exe')    os
-    #运行完毕后关闭浏览器 的驱动 （ie和谷歌）
 
 关闭进程
-    #evaluate    os.system('taskkill /f /im firefox.exe')    os
+    [Documentation]    运行用例前，关闭所有的 浏览器（ie，火狐，谷歌）
+    evaluate    os.system('taskkill /f /im firefox.exe')    os
     evaluate    os.system('taskkill /f /im chrome.exe')    os
     evaluate    os.system('taskkill /f /im iexplore.exe')    os
-    #运行用例前，关闭所有的 浏览器（ie，火狐，谷歌）
 
 打开浏览器
     [Arguments]    ${url}    ${browser}
+    [Documentation]    打开浏览器，参数${url}:是网址，参数${browser}：是浏览器（ie，gc,ff）
     open browser    ${url}    ${browser}
     Maximize Browser Window
     reload page
-    #打开浏览器    参数${url}:是网址    参数${browser}：是浏览器 （ie，gc）
 
 刷新网页
-    reload page    #刷新网页
+    [Documentation]    刷新网页
+    reload page
 
 关闭浏览器
+    [Documentation]    关闭当前浏览器
     sleep    2
     close browser
-    #关闭浏览器
 
 关闭所有浏览器
+    [Documentation]    关闭所有浏览器
     close all browsers
-    #关闭所有浏览器
 
 点击元素
     [Arguments]    ${locator}
@@ -116,10 +122,9 @@ ie输入文本
 
 点击radio
     [Arguments]    ${group_name}    ${value}
-    wait until page contains element    ${group_name}    10    page not contains element
+    [Documentation]    \#参数${group_name}：是 标签下name的值 参数${value}：是标签下value 的值
+    wait until page contains element    css=input[name='${group_name}']    10    page not contains element
     select radio button    ${group_name}    ${value}
-    #参数${group_name}：是 标签下name的值    参数${value}：是标签下value 的值
-    #点击小圆圈
 
 点击checkbox
     [Arguments]    ${locator}
@@ -161,9 +166,10 @@ jq双击
 
 jq输入
     [Arguments]    ${x}    ${y}
+    [Documentation]    \#jq定位是使用css定位的 参数${x}:是定位的后半部分    #例如：'#kw',必须使用 引号括起来    不用写'css:'或者'css='
     等待元素出现    css:${x[1:-1]}
     focus    css:${x[1:-1]}
-    execute javascript    $(${x}).val('${y}')
+    execute javascript    $('${x[1:-1]}').val('${y}')
     #jq定位是使用css定位的    参数${x}:是定位的后半部分    参数${y}是要输入的文本
     #例如：'#kw',必须使用 引号括起来    不用写'css:'或者'css='
 
@@ -258,6 +264,7 @@ div滚动条left
 跳到新窗口
     sleep    2
     select window    new
+    Maximize Browser Window
     #跳转到新窗口
 
 窗口最大化
@@ -338,13 +345,6 @@ py输入礼拜四
     assign id to element    ${locator}    ${t2}
     execute javascript    window.document.getElementById('${t2}').value='${t1}'
     #参数${locator}是输入框的 定位方式
-
-数据
-    [Arguments]    ${x}    ${y}
-    import library    ${x}/read.py
-    @{z}    read    ${x}    ${y}
-    #读取excel的数据    参数${x}为：excel存放地址    参数${y}：为excel的名字
-    [Return]    @{z}
 
 读取excel数据
     [Arguments]    ${name}
@@ -444,11 +444,12 @@ HR用户名
 接口数据检查点
     [Arguments]    ${resp}    ${actual_index}    ${expect_code}    ${expect_data}
     ${x}    to json    ${resp.content}    #将返回的数据格式化成 json格式
-    ${actual}    Evaluate    json.dumps(${x${actual_index}},encoding="UTF-8",ensure_ascii=False)    json    #得到实际结果值
-    ${json}    Evaluate    json.dumps(${expect_data},encoding="UTF-8",ensure_ascii=False)    json    #把预期数据结果转换 成json数据格式
+    ${actual}    Evaluate    json.dumps(${x${actual_index}},encoding='UTF-8',ensure_ascii=False)    json
+    ${expect}    Evaluate    json.dumps(${expect_data},encoding='UTF-8',ensure_ascii=False)    json
+    ${result}    Evaluate    ${actual}==${expect}
     ${x}    Catenate    SEPARATOR=,    ${resp.status_code}    ${actual}    #连接实际的状态码 和数据
     ${y}    Catenate    SEPARATOR=,    ${expect_code}    ${expect_data}    #连接预期的的状态码 和数据
-    log    ${x}    #打印实际结果
-    log    ${y}    #打印预期结果
+    log    ${x.replace('\n',',')}    #打印实际结果
+    log    ${y.replace('\n','').replace(' ','')}    #打印预期结果
     Should Be Equal As Strings    ${resp.status_code}    ${expect_code}    #对比返回码的正确性
-    Should Be Equal As Strings    ${json}    ${actual}    #对比数据正确性
+    Should Be Equal As Strings    ${result}    True    #对比数据正确性
