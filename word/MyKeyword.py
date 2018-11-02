@@ -16,7 +16,29 @@ class MyKeyword:
 		for i in range(0,c):
 			d.append(b.row_values(i))
 		return d
-
+	def date_monday(self):
+		'''
+		并且输出都为礼拜1
+		'''
+		d1=datetime.datetime.now()
+		d2=d1.weekday()
+		if d2==0:
+			return d2.strftime('%Y-%m-%d')
+		elif d2==1:
+			d3=d1-datetime.timedelta(days=1)
+			return d3.strftime('%Y-%m-%d')
+		elif d2==2:
+			d3=d1-datetime.timedelta(days=2)
+			return d3.strftime('%Y-%m-%d')
+		elif d2==3:
+			d3=d1-datetime.timedelta(days=3)
+			return d3.strftime('%Y-%m-%d')
+		elif d2==4:
+			d3=d1-datetime.timedelta(days=4)
+			return d3.strftime('%Y-%m-%d')
+		else:
+			print ('error')
+		
 	def date_weekend(self,x,y,z):
 		'''
 		判断是否是周末，+还是-，加减多少天
@@ -120,6 +142,19 @@ class MyKeyword:
 		#chrome_options.binary_location = r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" #手动指定使用的浏览器位置
 	#H5模式
 		return	chrome_options
+
+	def create_headlessfirefox_options(self):
+		firefox_options=webdriver.FirefoxOptions()
+		firefox_options.add_argument('--no-sandbox')#解决DevToolsActivePort文件不存在的报错
+		firefox_options.add_argument('--headless')#浏览器不提供可视化页面. linux下如果系统不支持可视化不加这条会启动失败
+		firefox_options.add_argument('--disable-gpu')#谷歌文档提到需要加上这个属性来规避bug
+		firefox_options.add_argument('--window-size=1920,1080')#指定浏览器分辨率
+		#firefox_options.add_argument('blink-settings=imagesEnabled=false') #不加载图片, 提升速度
+		firefox_options.add_argument('--hide-scrollbars') #隐藏滚动条, 应对一些特殊页面
+		#firefox_options.binary_location = r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" #手动指定使用的浏览器位置
+	#H5模式
+		return	firefox_options
+
 	def create_app_headlesschrome_options(self,deviceName='Mei Zu'):
 		devname={'deviceName':deviceName}
 		chrome_options=webdriver.ChromeOptions()
