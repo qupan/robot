@@ -1,7 +1,7 @@
 #coding=utf-8
 import xml.etree.ElementTree as ET
 import xml.dom.minidom
-import os,time
+import os,time,shutil,xlrd
 from openpyxl import Workbook
 from openpyxl import load_workbook
 from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Font, Color, Fill
@@ -16,24 +16,30 @@ try:
 	sys.setdefaultencoding('utf-8')
 except Exception as e:
 	print('run for python3')
+
+
 class Excel_Report():
 
 	def __init__(self,project_name):
+		#得到报告的地址
 		self.project_name=project_name
 		self.report_time=time.strftime('%Y.%m.%d.%H.%M.%S')
-		x=os.getcwd().split('word')[0]#得到当前的地址，以py分割
-		self.xml_addr=x+'report\\output.xml'#得到xml文件地址
-		self.output=x+'report\\output.xml'#得到output.xml文件地址
-		self.log=x+'report\\log.html'#得到log.html文件地址
-		self.report=x+'report\\report.html'#得到report.html文件地址
-		self.html_addr='file:///'+x+'report\\report.html'#得到html文件地址
-		self.excel_addr = x + 'report\\excel_report'#得到excel报告的存放地址
-		self.log_addr = x + 'report\\log'#得到log文本的存放地址
-		self.sys_report_new_addr=x+'report\\sys_report'#得到新地址
-		self.sys_report_addr=x+'report\\sys_report\\report'#得到新的report地址
+		self.x=os.getcwd().split('word')[0]#得到当前的地址，以word分割
+		self.output=self.x+'report\\output.xml'#得到output.xml文件地址
+		self.log=self.x+'report\\log.html'#得到log.html文件地址
+		self.report=self.x+'report\\report.html'#得到report.html文件地址
+		self.html_addr='file:///'+self.x+'report\\report.html'#得到html文件地址
+
+	def create_new_report(self):
+		self.excel_addr = self.x + 'report\\excel_report'#得到excel报告的存放地址
+		self.log_addr = self.x + 'report\\log'#得到log文本的存放地址
+
+		self.sys_report_new_addr=self.x+'report\\sys_report'#得到新地址
+		self.sys_report_addr=self.x+'report\\sys_report\\report'#得到新的report地址
 		#print(self.sys_report_addr)
-		self.sys_report_log=x+'report\\sys_report\\log'#得到新的log地址
-		self.sys_report_xml=x+'report\\sys_report\\xml'#得到新的xml地址
+		self.sys_report_log=self.x+'report\\sys_report\\log'#得到新的log地址
+		self.sys_report_xml=self.x+'report\\sys_report\\xml'#得到新的xml地址
+
 		if os.path.exists(self.excel_addr) == False:
 			os.mkdir(self.excel_addr)
 		if os.path.exists(self.log_addr)==False:
@@ -46,12 +52,31 @@ class Excel_Report():
 			os.mkdir(self.sys_report_log)
 		if os.path.exists(self.sys_report_xml)==False:
 			os.mkdir(self.sys_report_xml)
+
+		#新建报告存放地址保存每次生成的报告
 		x=self.sys_report_addr+'\\'+self.report_time+'-Report.html'
 		y=self.sys_report_log+'\\'+self.report_time+'-log.html'
 		z=self.sys_report_xml+'\\'+self.report_time+'-output.xml'
 		os.system('copy %s %s'%(self.report,x))#复制新的report.html
 		os.system('copy %s %s'%(self.log,y))#复制新的log.html
 		os.system('copy %s %s'%(self.output,z))#复制新的output.xml
+
+		self.screenshot=os.path.join(self.x,'report\\screenshot')#截图文件夹
+		self.screenshot_child=os.path.join(self.screenshot,self.report_time)#得到截图子文件夹
+		report=os.path.join(self.x,'report')#得到report文件夹地址
+		#创建截图的文件夹
+		if os.path.exists(self.screenshot)==False:
+			os.mkdir(self.screenshot)
+		if os.path.exists(self.screenshot_child)==False:
+			os.mkdir(self.screenshot_child)
+		#移动错误截图分开存放，方便管理
+		file_name=os.listdir(report)
+		for i in file_name:
+			if '.png' in i:
+				name=os.path.join(report,i)
+				shutil.move(name,self.screenshot_child)
+		
+
 
 	def create_excel(self):
 
@@ -229,7 +254,7 @@ class Excel_Report():
 		return message
 
 	def read_xml(self):
-		dom=xml.dom.minidom.parse(self.xml_addr)
+		dom=xml.dom.minidom.parse(self.output)
 		root=dom.documentElement
 		suite=root.getElementsByTagName("suite")
 		test=root.getElementsByTagName('test')
@@ -237,7 +262,7 @@ class Excel_Report():
 		s='::'
 		suit_message = []
 		self.log_name=self.log_addr+'\\'+self.report_time+'-log.txt'
-		file=open(self.log_name,'w')
+		file=open(self.log_name,'w')#创建新的log日志文件
 		for i in suite:
 			if '.txt' in i.getAttribute('source') or '.robot' in i.getAttribute('source') or '.tsv' in i.getAttribute('source') or'.html' in i.getAttribute('source'):
 				suite_name=i.getAttribute('name')#得到集合的名字
@@ -289,22 +314,22 @@ class Excel_Report():
 					Log=[]
 					for i in kw:
 						if i.getAttribute('name')=='Log':
-							#第一个是得到的信息，是实际结果，第二个是输入的信息，是预期结果
+							#第一个是得到的信息，是实际结果
 							x=i.getElementsByTagName('msg')
 							y=x[0].firstChild.data
-							file.write(y+s)#写入实际结果和预期结果
+							file.write(y+s)#写入实际结果
 						else:
 							Log.append(u'未得到结果')
-					if len(Log)==len(kw):#判断是否得到的预期结果和实际结果，未得到就是脚本问题
-						file.write(Log[0] + s)
-						file.write(Log[1] + s)
+					if len(Log)==len(kw):#判断是否得到的实际结果，未得到就是脚本问题
+						file.write(u'因为脚本的问题，未得到实际结果' + s)#写入			
+					file.write('message'+s)#写入实际结果，统一为message，后续读取每个模块的预期结果统一重写
 
 					file.write(case_status + s)#写入用例的状态
 
 					if case_status=='FAIL':
 						Fail_message=x[-1].firstChild.data#如果是失败的用例，得到失败的信息
 						print(Fail_message)
-						file.write(Fail_message.replace('\n',',')+s)
+						file.write(Fail_message.replace('\n',',')+s)#失败信息取消空格
 					elif case_status=='PASS':
 						file.write(u'无' + s)#如果是通过的用例写入空格
 
@@ -314,7 +339,32 @@ class Excel_Report():
 		file.close()
 		return suit_message
 
+	def read_all_excel(self):
+		#读取出自动化中全部的excel数据，进行处理，并且放到列表中
+		addr=os.path.join(self.x,'data')
+		x=os.listdir(addr)
+		excel_name=[]
+		excel_total=[]
+		for i in x:
+			if ('~$' not in i) and ('.xlsx' in i):
+				excel_name.append(i)
+		for i in excel_name:
+			x=os.path.join(addr,i)
+			y=xlrd.open_workbook(x)
+			z=y.sheets()[0]
+			value=z.col_values(1)
+			value.remove('预期结果')
+			for k in range(value.count('abandon')):
+				value.remove('abandon')
+			for j in value:
+				excel_total.append(j)
+		for i in range(len(excel_total)):
+			if excel_total[i] ==u'无':
+				excel_total[i]=u'预期结果在页面中获得'
+		return excel_total
+
 	def write_excel(self):
+		self.create_new_report()
 		wb = self.create_excel()
 		suite_name=self.read_xml()
 		run_time=self.total_time()
@@ -338,6 +388,11 @@ class Excel_Report():
 					ws2[column[j] + str(row_num[i])] = 'FAIL'
 				else:
 					ws2[column[j] + str(row_num[i])] = case_list[j]
+		#把得到的所有excel的预期结果重新写入到excel中
+		total=self.read_all_excel()
+		for i in range(len(total)):
+			ws2['F'+str(i+3)]=total[i]
+
 
 		#把数据写入第一个表格
 		#从第8行开始写
