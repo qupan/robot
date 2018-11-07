@@ -326,12 +326,18 @@ class Excel_Report():
 
 					file.write(case_status + s)#写入用例的状态
 
-					if case_status=='FAIL':
-						Fail_message=x[-1].firstChild.data#如果是失败的用例，得到失败的信息
-						print(Fail_message)
-						file.write(Fail_message.replace('\n',',')+s)#失败信息取消空格
-					elif case_status=='PASS':
-						file.write(u'无' + s)#如果是通过的用例写入空格
+
+					#写入失败信息
+					Fail_message=j.getElementsByTagName('msg')
+					for k in Fail_message:
+						x=k.getAttribute('level')
+						if x=="FAIL":
+							print(x)
+							file.write(k.firstChild.data.replace('\n',',')+s)#失败信息取消空格
+						elif case_status=='PASS':
+							file.write(u'无' + s)#如果是通过的用例写入空格
+
+
 
 					file.write(starttime + s + endtime + s)#写入开始时间和结束时间
 					file.write(str(len(test_case)) + s)
