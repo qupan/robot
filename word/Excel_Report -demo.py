@@ -167,7 +167,7 @@ class Excel_Report():
 		ws1=wb[u'用例执行情况']
 		#更改单元格宽度
 		for i in range(1,1000):
-			ws1.row_dimensions[i].height=18#更改行高为18
+			ws1.row_dimensions[i].height=40#更改行高为40
 		for i in ['A','B','C','D','E','F','G','H','I','J']:
 			for j in range(1,1000):
 				ws1[i+str(j)].border=border
@@ -176,11 +176,11 @@ class Excel_Report():
 				ws1[i+str(j)].alignment = alignment
 
 		ws1.column_dimensions['A'].width=25
-		ws1.column_dimensions['B'].width=35
-		ws1.column_dimensions['C'].width=25
+		ws1.column_dimensions['B'].width=40
+		ws1.column_dimensions['C'].width=13
 		ws1.column_dimensions['D'].width=35
 		ws1.column_dimensions['E'].width=25
-		ws1.column_dimensions['F'].width=25
+		ws1.column_dimensions['F'].width=40
 		ws1.column_dimensions['G'].width=15
 		ws1.column_dimensions['H'].width=100
 		ws1.column_dimensions['I'].width=25
@@ -321,7 +321,7 @@ class Excel_Report():
 						else:
 							Log.append(u'未得到结果')
 					if len(Log)==len(kw):#判断是否得到的实际结果，未得到就是脚本问题
-						file.write(u'因为脚本的问题，未得到实际结果' + s)#写入			
+						file.write(u'脚本运行失败，未得到实际结果' + s)#写入			
 					file.write('message'+s)#写入实际结果，统一为message，后续读取每个模块的预期结果统一重写
 
 					file.write(case_status + s)#写入用例的状态
