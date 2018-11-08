@@ -1,0 +1,5 @@
+linux常用命令大全 https://www.cnblogs.com/yjd_hycf_space/p/7730690.html
+
+配置环境变量，jdk或者Tomcat,使用：
+vi ~/.bashrc
+source ~/.bashrc
