@@ -22,3 +22,4 @@ rpm命令：https://www.cnblogs.com/datasyman/p/6942557.html
 离线包下载：
 https://pkgs.org/download/libX11-xcb.so.1
 http://mirrors.163.com/centos/7/os/x86_64/Packages/
+http://rpmfind.net/linux/rpm2html/search.php?query=libX11-xcb.so.1&submit=Search+...&system=&arch=
