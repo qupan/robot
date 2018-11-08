@@ -4,4 +4,15 @@ linux常用命令大全 https://www.cnblogs.com/yjd_hycf_space/p/7730690.html
 vi ~/.bashrc
 source ~/.bashrc
 
+
+
 Tomcat更改：文件https://www.cnblogs.com/xdp-gacl/p/4097608.html
+
+linux源码包下载：http://mirrors.163.com/centos/7/os/x86_64/Packages/
+设置service iptabels restart错误：https://blog.csdn.net/shmily_lsl/article/details/80738711
+给文件夹权限：https://jingyan.baidu.com/article/5bbb5a1bf6b85f13eaa17979.html
+离线安装iptals：https://blog.csdn.net/qq_21072793/article/details/78658979
+
+rpm命令：https://www.cnblogs.com/datasyman/p/6942557.html
+
+配置防火墙：https://www.linuxidc.com/Linux/2015-05/117473.htm
