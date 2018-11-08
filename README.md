@@ -16,3 +16,6 @@ https://www.cnblogs.com/baihuitestsoftware/articles/5923411.html
 
 xpath详细学习
 http://www.cnblogs.com/ktgu/archive/2009/04/16/1353246.html
+
+linux常用命令大全
+https://www.cnblogs.com/yjd_hycf_space/p/7730690.html
