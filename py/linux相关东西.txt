@@ -6,7 +6,10 @@ source ~/.bashrc
 
 
 
-Tomcat更改：文件https://www.cnblogs.com/xdp-gacl/p/4097608.html
+Tomcat更改：文件
+教程:
+https://blog.csdn.net/thebigdipperbdx/article/details/79425185
+https://www.cnblogs.com/xdp-gacl/p/4097608.html
 
 linux源码包下载：http://mirrors.163.com/centos/7/os/x86_64/Packages/
 设置service iptabels restart错误：https://blog.csdn.net/shmily_lsl/article/details/80738711
