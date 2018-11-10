@@ -29,3 +29,5 @@ https://pkgs.org/download/libX11-xcb.so.1
 http://mirrors.163.com/centos/7/os/x86_64/Packages/
 http://rpmfind.net/linux/rpm2html/search.php?query=libX11-xcb.so.1&submit=Search+...&system=&arch=
 
+用yum将安装包及其依赖包下载到本地的方法
+https://blog.csdn.net/GX_1_11_real/article/details/80694556
