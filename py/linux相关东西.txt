@@ -23,6 +23,7 @@ https://www.linuxidc.com/Linux/2015-05/117473.htm
 https://blog.csdn.net/civilizationV/article/details/82345479
 
 问题：https://blog.csdn.net/striverchuiying/article/details/81479308
+https://blog.csdn.net/a1368783069/article/details/80630630
 
 离线包下载：
 https://pkgs.org/download/libX11-xcb.so.1
