@@ -18,7 +18,9 @@ linux源码包下载：http://mirrors.163.com/centos/7/os/x86_64/Packages/
 
 rpm命令：https://www.cnblogs.com/datasyman/p/6942557.html
 
-配置防火墙：https://www.linuxidc.com/Linux/2015-05/117473.htm
+配置防火墙：
+https://www.linuxidc.com/Linux/2015-05/117473.htm
+https://blog.csdn.net/civilizationV/article/details/82345479
 
 问题：https://blog.csdn.net/striverchuiying/article/details/81479308
 
