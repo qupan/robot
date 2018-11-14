@@ -306,7 +306,7 @@ class Excel_Report():
 						else:
 							input_data.append(u'空')
 					if len(input_data) == len(input_message):
-						file.write(u'未得到结果')
+						file.write(u'无输入数据')
 					file.write(s)
 
 					#得到实际结果和预期结果
@@ -332,10 +332,11 @@ class Excel_Report():
 					for k in Fail_message:
 						x=k.getAttribute('level')
 						if x=="FAIL":
-							print(x)
+							#print(x)
 							file.write(k.firstChild.data.replace('\n',',')+s)#失败信息取消空格
-						elif case_status=='PASS':
-							file.write(u'无' + s)#如果是通过的用例写入空格
+
+					if case_status=='PASS':
+						file.write(u'无' + s)#如果是通过的用例是没有失败信息的，写入默认字段“无”
 
 
 
@@ -441,4 +442,4 @@ class Excel_Report():
 		file.close()
 
 if __name__=="__main__":
-	Excel_Report(u'Project').write_excel()
+	Excel_Report(u'国际B2B').write_excel()
