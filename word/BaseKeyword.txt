@@ -60,7 +60,7 @@ click_element
     ...    参数${locator}：是定位 方式 例如：id:kw
     wait_element    ${locator}
     focus    ${locator}
-    click element    ${locator}
+    Selenium2Library.Click Element    ${locator}
 
 click_list
     [Arguments]    ${locator}    ${number}
@@ -70,7 +70,7 @@ click_list
     Sleep    2
     @{x}    get webelements    ${locator}
     focus    @{x}[${number}]
-    click element    @{x}[${number}]
+    Selenium2Library.Click Element    @{x}[${number}]
 
 click_button
     [Arguments]    ${locator}
@@ -78,7 +78,7 @@ click_button
     ...    参数${locator}：是 定位方式
     wait_element    ${locator}
     focus    ${locator}
-    click button    ${locator}
+    Selenium2Library.Click Button    ${locator}
 
 click_link
     [Arguments]    ${locator}
@@ -86,7 +86,7 @@ click_link
     ...    参数${locator}：是定位 方式
     wait_element    ${locator}
     focus    ${locator}
-    click link    ${locator}
+    Selenium2Library.Click Link    ${locator}
 
 double_click
     [Arguments]    ${locator}
@@ -102,16 +102,16 @@ input_text
     ...    参数${locator}：是定位 方式 参数${text}：是要输入的文本
     wait_element    ${locator}
     clear element text    ${locator}
-    input text    ${locator}    ${text}
+    Selenium2Library.Input Text    ${locator}    ${text}
 
 input_list
     [Arguments]    ${locator}    ${index}    ${text}
     [Documentation]    得到所有元素列表，根据索引进行输入文本
-    ...    参数${locator}：是定位 方式	参数${text}：是要输入的文本，${index}是在列表中的索引
+    ...    参数${locator}：是定位 方式 参数${text}：是要输入的文本，${index}是在列表中的索引
     sleep    2
     @{x}    get webelements    ${locator}
     focus    @{x}[${index}]
-    input text    @{x}[${index}]    ${text}
+    Selenium2Library.Input Text    @{x}[${index}]    ${text}
     press key    @{x}[${index}]    \\13
 
 click_radio
@@ -138,7 +138,7 @@ select_list_value
 
 select_list_index
     [Arguments]    ${locator}    ${index}
-    [Documentation]    参数${locator}：是定位 方式	参数${index}：是标签option索引值
+    [Documentation]    参数${locator}：是定位 方式 参数${index}：是标签option索引值
     ...    点击列表下拉框
     wait_element    ${locator}
     focus    ${locator}
@@ -146,79 +146,70 @@ select_list_index
 
 jq_click
     [Arguments]    ${x}
-    [Documentation]    使用jQuery进行点击
-    ...    #jq定位是使用css定位的	参数${x}:是定位的后半部分
-    ...    #例如：'#kw',必须使用 引号括起来	不用写'css:'或者'css='
+    [Documentation]    使用jQuery进行点击    #jq定位是使用css定位的    参数${x}:是定位的后半部分    #例如：'#kw',必须使用 引号括起来    不用写'css:'或者'css='
+    ...
     wait_element    css:${x[1:-1]}
     focus    css:${x[1:-1]}
     execute javascript    $(${x}).click()
 
 jq_dblclick
     [Arguments]    ${x}
-    [Documentation]    使用jQuery进行双击
-    ...    #jq定位是使用css定位的	参数${x}:是定位的后半部分
-    ...    #例如：'#kw',必须使用 引号括起来	不用写'css:'或者'css='
+    [Documentation]    使用jQuery进行双击    #jq定位是使用css定位的    参数${x}:是定位的后半部分    #例如：'#kw',必须使用 引号括起来    不用写'css:'或者'css='
+    ...
     wait_element    css:${x[1:-1]}
     focus    css:${x[1:-1]}
     execute javascript    $(${x}).dblclick()
 
 jq_input
     [Arguments]    ${x}    ${y}
-    [Documentation]    使用jQuery进行输入文本    #例如：'#kw',必须使用 引号括起来    不用写'css:'或者'css='
-    ...    #jq定位是使用css定位的，参数${x}:是定位的后半部分	参数${y}是要输入的文本
-    ...    #例如：'#kw',必须使用 引号括起来	不用写'css:'或者'css='
+    [Documentation]    使用jQuery进行输入文本    #例如：'#kw',必须使用 引号括起来    不用写'css:'或者'css='    #jq定位是使用css定位的，参数${x}:是定位的后半部分    参数${y}是要输入的文本    #例如：'#kw',必须使用 引号括起来    不用写'css:'或者'css='
+    ...
     wait_element    css:${x[1:-1]}
     focus    css:${x[1:-1]}
     execute javascript    $('${x[1:-1]}').val('${y}')
 
 js_click
     [Arguments]    ${x}
-    [Documentation]    JavaScript进行点击
-    ...    #js定位是使用css定位的	参数${x}:是定位的后半部分
-    ...    #例如：'#kw',必须使用 引号括起来	不用写'css:'或者'css='
+    [Documentation]    JavaScript进行点击    #js定位是使用css定位的    参数${x}:是定位的后半部分    #例如：'#kw',必须使用 引号括起来    不用写'css:'或者'css='
+    ...
     wait_element    css:${x[1:-1]}
     focus    css:${x[1:-1]}
     execute javascript    document.querySelector(${x}).click()
 
 js_click_list
     [Arguments]    ${x}    ${index}
-    [Documentation]    使用JavaScript进行点击
-    ...    #js定位是使用css定位的	参数${x}:是定位的后半部分	参数${index}是要点击的第几个数字
-    ...    #例如：'#kw',必须使用 引号括起来	不用写'css:'或者'css='
+    [Documentation]    使用JavaScript进行点击    #js定位是使用css定位的    参数${x}:是定位的后半部分    参数${index}是要点击的第几个数字    #例如：'#kw',必须使用 引号括起来    不用写'css:'或者'css='
+    ...
     wait_element    css:${x[1:-1]}
     focus    css:${x[1:-1]}
     execute javascript    document.querySelectorAll(${x})[${index}].click()
 
 js_input
     [Arguments]    ${x}    ${text}
-    [Documentation]    使用JavaScript输入文本
-    ...    #js定位是使用css定位的	参数${locator}:是定位方式	参数${text}：是要输入的文本
+    [Documentation]    使用JavaScript输入文本    #js定位是使用css定位的    参数${locator}:是定位方式    参数${text}：是要输入的文本
     wait_element    css:${x[1:-1]}
     focus    css:${x[1:-1]}
     execute javascript    document.querySelector(${x}).value='${text}'
 
 js_input_list
     [Arguments]    ${x}    ${index}    ${text}
-    [Documentation]    使用JavaScript进行输入文本
-    ...    #js定位是使用css定位的	参数${x}:是定位的后半部分	参数${index}是要点击的第几个数字,${text}是输入文本
-    ...    #例如：'#kw',必须使用 引号括起来	不用写'css:'或者'css='
+    [Documentation]    使用JavaScript进行输入文本    #js定位是使用css定位的    参数${x}:是定位的后半部分    参数${index}是要点击的第几个数字,${text}是输入文本    #例如：'#kw',必须使用 引号括起来    不用写'css:'或者'css='
+    ...
     sleep    2
     execute javascript    document.querySelectorAll(${x})[${index}].value='${text}'
 
 div_scroll_Top
     [Arguments]    ${x}    ${number}
-    [Documentation]    div内置滚动条上下移动
-    ...    #js定位是使用css定位的	参数${x}:是定位的后半部分	参数${number}：是滚动的位置 ，输入的值
-    ...    #例如：'#kw',必须使用引号 括起来	不用写'css:'或者'css='
+    [Documentation]    div内置滚动条上下移动    #js定位是使用css定位的    参数${x}:是定位的后半部分    参数${number}：是滚动的位置 ，输入的值    #例如：'#kw',必须使用引号 括起来    不用写'css:'或者'css='
+    ...
     wait_element    css:${x[1:-1]}
     focus    css:${x[1:-1]}
     execute javascript    document.querySelector(${x}).scrollTop=${number}
 
 div_scroll_Left
     [Arguments]    ${x}    ${number}
-    [Documentation]    div内置滚动条左右移动
-    ...    #js定位是使用css定位的	参数${x}:是定位的后半部分	参数${number}：是滚动的位置 ，输入的值
-    ...    #例如：'#kw',必须使用引号 括起来	不用写'css:'或者'css='
+    [Documentation]    div内置滚动条左右移动    #js定位是使用css定位的    参数${x}:是定位的后半部分    参数${number}：是滚动的位置 ，输入的值    #例如：'#kw',必须使用引号 括起来    不用写'css:'或者'css='
+    ...
     wait_element    css:${x[1:-1]}
     focus    css:${x[1:-1]}
     execute javascript    document.querySelector(${x}).scrollLeft=${number}
@@ -237,16 +228,14 @@ open_new_page
 
 switch_fram
     [Arguments]    ${locator}
-    [Documentation]    \#切换到frame框，	参数${locator}：是定位方式，
-    ...    #如果有id和name的话直接写： 两个属性的值即可	例如id=kw，name=su，直接写 kw或su即可
+    [Documentation]    \#切换到frame框， 参数${locator}：是定位方式，    #如果有id和name的话直接写： 两个属性的值即可    例如id=kw，name=su，直接写 kw或su即可
     wait_element    ${locator}
     focus    ${locator}
     select frame    ${locator}
 
 switch_window
     [Arguments]    ${x}    ${y}
-    [Documentation]    \#要跳转到第三个窗口	输入三个窗口的列表和两个窗口 的列列表
-    ...    #两个列表的前后没有关系
+    [Documentation]    \#要跳转到第三个窗口 输入三个窗口的列表和两个窗口 的列列表    #两个列表的前后没有关系
     ${z}    evaluate    [list(set(${x})-set(${y}))[0] if len(${x}) > len(${y}) else list(set(${y})-set(${x}))[0]]
     sleep    3
     select window    ${z[0]}
@@ -259,15 +248,15 @@ asset_contain
 
 get_text
     [Arguments]    ${locator}
-    [Documentation]    \#得到页面中的文本	参数${locator}：是定位方式	最后将文本${x}返回
+    [Documentation]    \#得到页面中的文本 参数${locator}：是定位方式 最后将文本${x}返回
     wait_element    ${locator}
     focus    ${locator}
-    ${x}    get text    ${locator}
+    ${x}    Selenium2Library.Get Text    ${locator}
     [Return]    ${x}
 
 get_attr
     [Arguments]    ${locator}    ${name}
-    [Documentation]    \#得到页面中的元素的属性	参数${locator}：是定位方式	${name}是属性名称
+    [Documentation]    \#得到页面中的元素的属性 参数${locator}：是定位方式 ${name}是属性名称
     wait_element    ${locator}
     focus    ${locator}
     ${atrr}    Selenium2Library.Get Element Attribute    ${locator}    ${name}
@@ -281,8 +270,7 @@ join_str
 
 rf_input_time
     [Arguments]    ${locator}    ${number}
-    [Documentation]    \#给input标签输入日期	参数${locator} 是：定位方式	参数${number}：是给当前时间 加或减少的天数
-    ...    #增加3天：输入数字3即可	减少3天：输入-3即可
+    [Documentation]    \#给input标签输入日期 参数${locator} 是：定位方式 参数${number}：是给当前时间 加或减少的天数    #增加3天：输入数字3即可    减少3天：输入-3即可
     ${t1}    get current date
     ${t2}    add time to date    ${t1}    ${number}days
     wait_element    ${locator}
@@ -292,8 +280,7 @@ rf_input_time
 
 py_input_time
     [Arguments]    ${x}    ${y}    ${z}    ${d}
-    [Documentation]    \#给input标签输入日期	参数${x}是定位方式	参数${y}是：是否判断周末 判断输入yes，不判断输入no	${d}:增减的天数
-    ...    #${z},增加日期输入+ 减少日期输入-	参数${d}是要减少或增加的天数	\
+    [Documentation]    \#给input标签输入日期 参数${x}是定位方式 参数${y}是：是否判断周末 判断输入yes，不判断输入no ${d}:增减的天数    #${z},增加日期输入+ 减少日期输入-    参数${d}是要减少或增加的天数
     ${t1}    evaluate    int(${d})
     ${t2}    Date Weekend    ${y}    ${z}    ${t1}
     wait_element    ${x}
@@ -312,7 +299,7 @@ py_input_thurday
 
 get_excel_data
     [Arguments]    ${name}
-    [Documentation]    \#读取excel的数据	参数${x}为：excel存放地址	参数${y}：为excel的名字
+    [Documentation]    \#读取excel的数据 参数${x}为：excel存放地址 参数${y}：为excel的名字
     ${x}    Set Variable    ${CURDIR}
     ${x1}    Set Variable    ${x.split('\word')[0]}
     ${excel_address}    join_str    ${x1}    \\data\\${name}.xlsx    #得到excel存放地址
@@ -328,7 +315,7 @@ mouse_over
     [Arguments]    ${locator}
     [Documentation]    鼠标悬浮到元素上
     wait_element    ${locator}
-    Mouse Over    ${locator}
+    Selenium2Library.Mouse Over    ${locator}
 
 upload
     [Arguments]    ${locator}    ${name}
