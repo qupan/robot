@@ -1,6 +1,8 @@
 #-*- coding:utf-8 -*-
 import xlrd,time,datetime,json
 from selenium import webdriver
+from pykeyboard import PyKeyboard
+from pathlib import Path
 
 class MyKeyword:
 
@@ -38,7 +40,7 @@ class MyKeyword:
 			return d3.strftime('%Y-%m-%d')
 		else:
 			print ('error')
-		
+
 	def date_weekend(self,x,y,z):
 		'''
 		判断是否是周末，+还是-，加减多少天
@@ -165,6 +167,11 @@ class MyKeyword:
 		# chrome_options.add_argument('--window-size=1920,1080')
 		return chrome_options
 
+	def upload_file(self,addr):
+		time.sleep(5)
+		k=PyKeyboard()
+		k.type_string(addr)
+		k.tap_key(k.enter_key)
 
 if __name__ == '__main__':
 	x=My_Keyword().convert_dict('page=看见看见,Size=4')
