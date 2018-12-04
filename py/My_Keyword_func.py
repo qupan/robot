@@ -1,8 +1,10 @@
 #-*- coding:utf-8 -*-
 import xlrd,time,datetime,json
-import ast
+from selenium import webdriver
+from pykeyboard import PyKeyboard
+from pathlib import Path
 
-def read_excel(addr):
+def read_excel(self,addr):
 	'''
 	使用xlrd模块，读取excel文件，参数addr为excel存放的绝对路径
 	例如：D:/robot/data/demo.xlsx
@@ -15,7 +17,61 @@ def read_excel(addr):
 		d.append(b.row_values(i))
 	return d
 
-def date_weekend(x,y,z):
+def read_excel_data(self,addr,read_way='row'):
+	'''
+	使用xlrd模块，读取excel文件，参数addr为excel存放的绝对路径
+	例如：D:/robot/data/demo.xlsx
+	read_way读取的方法，默认是列读取，值为col时候
+	'''
+	if read_way=='row':
+		a=xlrd.open_workbook(addr)
+		number=a.sheets()
+		data=[]
+		for j in range(len(number)):
+			b=a.sheets()[j]
+			c=b.nrows
+			d=[]
+			for i in range(c):
+				d.append(b.row_values(i))
+			data.append(d)
+		return data
+	elif read_way=='col':
+		a=xlrd.open_workbook(addr)
+		number=a.sheets()
+		data=[]
+		for j in range(len(number)):
+			b=a.sheets()[j]
+			c=b.ncols
+			d=[]
+			for i in range(c):
+				d.append(b.col_values(i))
+			data.append(d)
+		return data
+
+def date_monday(self):
+	'''
+	并且输出都为礼拜1
+	'''
+	d1=datetime.datetime.now()
+	d2=d1.weekday()
+	if d2==0:
+		return d2.strftime('%Y-%m-%d')
+	elif d2==1:
+		d3=d1-datetime.timedelta(days=1)
+		return d3.strftime('%Y-%m-%d')
+	elif d2==2:
+		d3=d1-datetime.timedelta(days=2)
+		return d3.strftime('%Y-%m-%d')
+	elif d2==3:
+		d3=d1-datetime.timedelta(days=3)
+		return d3.strftime('%Y-%m-%d')
+	elif d2==4:
+		d3=d1-datetime.timedelta(days=4)
+		return d3.strftime('%Y-%m-%d')
+	else:
+		print ('error')
+
+def date_weekend(self,x,y,z):
 	'''
 	判断是否是周末，+还是-，加减多少天
 	参数x：【yes或no】，
@@ -60,7 +116,7 @@ def date_weekend(x,y,z):
 	else:
 		print ('arguments error')
 
-def date_thursdy():
+def date_thursdy(self):
 	'''
 	离职时间是礼拜4，不超过30天,
 	并且输出都为礼拜4
@@ -91,40 +147,60 @@ def date_thursdy():
 	else:
 		print ('error')
 
-def convert_dict(message):
+def convert_dict(self,message):
 	'''
 	输入入参数据，将数据装换成字典
 	输入格式为：page=1,Size=4
 	'''
 	list_message=[]
-	if '&' in message:
-		x=message.split('&')
-		for i in range(len(x)):
-			y=x[i].split('=')
-			z=tuple(y)
-			list_message.append(z)
-		dict_message=dict(list_message)
-		#json_dict_message=json.dumps(dict_message,encoding="UTF-8",ensure_ascii=False)
-	elif '=' in message:
-		x=message.split('=')
-		y=tuple(x)
-		list_message.append(y)
-		dict_message=dict(list_message)
-	return dict_message
+	x=message.split(',')
+	for i in range(len(x)):
+		y=x[i].split('=')
+		z=tuple(y)
+		list_message.append(z)
+	dict_message=dict(list_message)
+	json_dict_message=json.dumps(dict_message,encoding="UTF-8",ensure_ascii=False)
+	return json_dict_message
 
-def json_dict(json_str):
-    '''
-    输入json字符串转换成字典
-    并返回
-    '''
-    json_data=json.dumps(json_str,encoding='UTF-8',ensure_ascii=False)
-    json_dict=json.loads(json_data)
-    return json_dict
+#web模式
+def create_headlesschrome_options(self):
+	chrome_options=webdriver.ChromeOptions()
+	chrome_options.add_argument('--no-sandbox')#解决DevToolsActivePort文件不存在的报错
+	chrome_options.add_argument('--headless')#浏览器不提供可视化页面. linux下如果系统不支持可视化不加这条会启动失败
+	chrome_options.add_argument('--disable-gpu')#谷歌文档提到需要加上这个属性来规避bug
+	chrome_options.add_argument('--window-size=1920,1080')#指定浏览器分辨率
+	#chrome_options.add_argument('blink-settings=imagesEnabled=false') #不加载图片, 提升速度
+	chrome_options.add_argument('--hide-scrollbars') #隐藏滚动条, 应对一些特殊页面
+	#chrome_options.binary_location = r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" #手动指定使用的浏览器位置
+#H5模式
+	return	chrome_options
 
-def assert_equal(self,actual_code,except_code,actual_data,except_data,):
-	except_data=ast.literal_eval(except_data)
-	self.assertEqual(str(actual_code), str(except_code))#判断返回码是否正确
-	self.assertEqual(actual_data, except_data)  #判断返回数据是否正确
+def create_headlessfirefox_options(self):
+	firefox_options=webdriver.FirefoxOptions()
+	firefox_options.add_argument('--no-sandbox')#解决DevToolsActivePort文件不存在的报错
+	firefox_options.add_argument('--headless')#浏览器不提供可视化页面. linux下如果系统不支持可视化不加这条会启动失败
+	firefox_options.add_argument('--disable-gpu')#谷歌文档提到需要加上这个属性来规避bug
+	firefox_options.add_argument('--window-size=1920,1080')#指定浏览器分辨率
+	#firefox_options.add_argument('blink-settings=imagesEnabled=false') #不加载图片, 提升速度
+	firefox_options.add_argument('--hide-scrollbars') #隐藏滚动条, 应对一些特殊页面
+	#firefox_options.binary_location = r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" #手动指定使用的浏览器位置
+#H5模式
+	return	firefox_options
 
-if __name__ == '__main__':
-	print('ok')
+def create_app_headlesschrome_options(self,deviceName='Mei Zu'):
+	devname={'deviceName':deviceName}
+	chrome_options=webdriver.ChromeOptions()
+	chrome_options.add_argument('--headless')
+	chrome_options.add_argument('disable-gpu')
+	#chrome_options.add_argument('--deviceName=iPhone 5/SE')
+	chrome_options.add_experimental_option('mobileEmulation',devname)
+	# chrome_options.add_argument('--window-size=1920,1080')
+	return chrome_options
+
+def upload_file(self,addr):
+	time.sleep(5)
+	k=PyKeyboard()
+	k.type_string(addr)
+	k.tap_key(k.enter_key)
+
+
