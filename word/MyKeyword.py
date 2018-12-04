@@ -1,10 +1,8 @@
 #-*- coding:utf-8 -*-
 import xlrd,time,datetime,json
 from selenium import webdriver
-from pykeyboard import PyKeyboard
-from pathlib import Path
 
-def read_excel(self,addr):
+def read_excel(addr):
 	'''
 	使用xlrd模块，读取excel文件，参数addr为excel存放的绝对路径
 	例如：D:/robot/data/demo.xlsx
@@ -17,7 +15,7 @@ def read_excel(self,addr):
 		d.append(b.row_values(i))
 	return d
 
-def read_excel_data(self,addr,read_way='row'):
+def read_excel_data(addr,read_way='row'):
 	'''
 	使用xlrd模块，读取excel文件，参数addr为excel存放的绝对路径
 	例如：D:/robot/data/demo.xlsx
@@ -48,7 +46,7 @@ def read_excel_data(self,addr,read_way='row'):
 			data.append(d)
 		return data
 
-def date_monday(self):
+def date_monday():
 	'''
 	并且输出都为礼拜1
 	'''
@@ -71,7 +69,7 @@ def date_monday(self):
 	else:
 		print ('error')
 
-def date_weekend(self,x,y,z):
+def date_weekend(x,y,z):
 	'''
 	判断是否是周末，+还是-，加减多少天
 	参数x：【yes或no】，
@@ -116,7 +114,7 @@ def date_weekend(self,x,y,z):
 	else:
 		print ('arguments error')
 
-def date_thursdy(self):
+def date_thursdy():
 	'''
 	离职时间是礼拜4，不超过30天,
 	并且输出都为礼拜4
@@ -147,7 +145,7 @@ def date_thursdy(self):
 	else:
 		print ('error')
 
-def convert_dict(self,message):
+def convert_dict(message):
 	'''
 	输入入参数据，将数据装换成字典
 	输入格式为：page=1,Size=4
@@ -163,7 +161,7 @@ def convert_dict(self,message):
 	return json_dict_message
 
 #web模式
-def create_headlesschrome_options(self):
+def create_headlesschrome_options():
 	chrome_options=webdriver.ChromeOptions()
 	chrome_options.add_argument('--no-sandbox')#解决DevToolsActivePort文件不存在的报错
 	chrome_options.add_argument('--headless')#浏览器不提供可视化页面. linux下如果系统不支持可视化不加这条会启动失败
@@ -175,7 +173,7 @@ def create_headlesschrome_options(self):
 #H5模式
 	return	chrome_options
 
-def create_headlessfirefox_options(self):
+def create_headlessfirefox_options():
 	firefox_options=webdriver.FirefoxOptions()
 	firefox_options.add_argument('--no-sandbox')#解决DevToolsActivePort文件不存在的报错
 	firefox_options.add_argument('--headless')#浏览器不提供可视化页面. linux下如果系统不支持可视化不加这条会启动失败
@@ -187,7 +185,7 @@ def create_headlessfirefox_options(self):
 #H5模式
 	return	firefox_options
 
-def create_app_headlesschrome_options(self,deviceName='Mei Zu'):
+def create_app_headlesschrome_options(deviceName='Mei Zu'):
 	devname={'deviceName':deviceName}
 	chrome_options=webdriver.ChromeOptions()
 	chrome_options.add_argument('--headless')
@@ -196,11 +194,3 @@ def create_app_headlesschrome_options(self,deviceName='Mei Zu'):
 	chrome_options.add_experimental_option('mobileEmulation',devname)
 	# chrome_options.add_argument('--window-size=1920,1080')
 	return chrome_options
-
-def upload_file(self,addr):
-	time.sleep(5)
-	k=PyKeyboard()
-	k.type_string(addr)
-	k.tap_key(k.enter_key)
-
-
