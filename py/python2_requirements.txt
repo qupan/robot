@@ -35,3 +35,4 @@ APScheduler
 python_dateutil
 Jinja2
 PyUserInput
+pathlib
