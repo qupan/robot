@@ -38,3 +38,4 @@ Jinja2
 PyUserInput
 pathlib
 crypto
+pywin32
