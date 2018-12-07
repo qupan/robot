@@ -330,10 +330,6 @@ class Excel_Report():
 					#如果两个值是相等的，就是脚本运行失败没到达检查点那一步，没有打印出来
 					if len(Log)==(len(kw)-1):
 						file.write(u'脚本运行失败，未得到实际结果' + s)#写入实际结果
-					if len(Log)==len(kw):
-						file.write(u'预期结果未打印出来' + s)#写入实际结果
-						file.write(u'实际结果未打印出来' + s)#写入实际结果
-
 
 					file.write(case_status + s)#写入用例的状态
 
@@ -373,14 +369,17 @@ class Excel_Report():
 				case_list.remove('')
 			column=['A','B','C','D','E','F','G','H','I','J']
 			for j in range(len(column)):
-				if 'PASS' in case_list[j]:
-					ws2[column[j] + str(row_num[i])].fill=PatternFill(patternType='solid',start_color='339966')
-					ws2[column[j] + str(row_num[i])] = 'PASS'
-				elif 'FAIL' in case_list[j]:
-					ws2[column[j] + str(row_num[i])].fill = PatternFill(patternType='solid', start_color='FF0000')
-					ws2[column[j] + str(row_num[i])] = 'FAIL'
-				else:
-					ws2[column[j] + str(row_num[i])] = case_list[j]
+				try:
+					if 'PASS' in case_list[j]:
+						ws2[column[j] + str(row_num[i])].fill=PatternFill(patternType='solid',start_color='339966')
+						ws2[column[j] + str(row_num[i])] = 'PASS'
+					elif 'FAIL' in case_list[j]:
+						ws2[column[j] + str(row_num[i])].fill = PatternFill(patternType='solid', start_color='FF0000')
+						ws2[column[j] + str(row_num[i])] = 'FAIL'
+					else:
+						ws2[column[j] + str(row_num[i])] = case_list[j]
+				except Exception as e:
+					print('pass')
 
 
 		#把数据写入第一个表格
