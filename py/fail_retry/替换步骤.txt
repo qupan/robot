@@ -5,7 +5,7 @@ https://www.cnblogs.com/baihuitestsoftware/articles/5923411.html
 
 1、python2.7\Lib\site-packages\robot\run.py
 
-2、python2.7\Lib\site-packages\robot\conf\settings.py
+2、python2.7\Lib\site-packages\robot\conf\settings.py     修改_extra_cli_opts字典，增加 'Retry':('retry',3),修改重跑次数
 
 3、python2.7\Lib\site-packages\robot\model\itemlist.py
 
