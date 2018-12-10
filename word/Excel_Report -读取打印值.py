@@ -327,7 +327,14 @@ class Excel_Report():
 						else:
 							Log.append(u'未得到结果')
 					#判断是否得到的预期结果和实际结果，未得到就是脚本问题
+					
 					#如果两个值是相等的，就是脚本运行失败没到达检查点那一步，没有打印出来
+					if len(Log)==len(kw):#如果连个值相等的话，说明预期和实际结果都没有打印出来
+						file.write(u'预期结果从页面获取失败' + s)#写入预期结果
+						file.write(u'脚本运行失败，未得到实际结果' + s)#写入实际结果
+
+					#如果列表log的长度小于全部标签集合kw长度减1，说明没得到实际结果
+					#只得到了预期结果
 					if len(Log)==(len(kw)-1):
 						file.write(u'脚本运行失败，未得到实际结果' + s)#写入实际结果
 
@@ -369,7 +376,7 @@ class Excel_Report():
 				case_list.remove('')
 			column=['A','B','C','D','E','F','G','H','I','J']
 			for j in range(len(column)):
-				try:
+				try:#使用try进行捕捉异常，不清楚怎么回事，会报错错，待解决
 					if 'PASS' in case_list[j]:
 						ws2[column[j] + str(row_num[i])].fill=PatternFill(patternType='solid',start_color='339966')
 						ws2[column[j] + str(row_num[i])] = 'PASS'
