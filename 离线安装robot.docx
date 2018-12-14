@@ -1,0 +1,58 @@
+windows离线状态下源码安装Robotframework 环境及其依赖包
+原创 2017年10月31日 14:37:19 
+标签：
+自动化 /
+robotframework 
+146
+编辑 删除 最近公司需要在内网环境搭建自动化平台，无外网，因而无法使用方便快捷的PIP进行安装，但RF框架各组件有很多版本依赖，离线源码安装可能不知道有哪些依赖，特将自己采坑后的总结分享如下，以飨同道。
+
+一、准备所需源码包
+①python2.7                  地址：https://www.python.org/downloads/
+下载系统对应版本安装包，双击安装即可
+这是一切的基础，至于为什么不使用python3，因为RF的ride不支持。
+安装完成需要配置环境变量：在path的路径里添加：Python的路径:C:\python和C:\python\Scripts
+②WxPython                 地址：https://sourceforge.net/projects/wxpython/files/wxPython
+wxPython 是Python 非常有名的一个GUI 库，因为RIDE 是基于这个库开发的，所以这个必须安装。
+在官网上找到相应的版本下载，为exe 可执行文件，双击按钮即可。
+注意：对应的win32还是win64，不是你的操作系统的版本，而是对应的安装python是32位还是64位
+当前robotframework-ide所兼容的版本为wxPython2.8-win64-unicode-2.8.12.1-py27.exe或者wxPython2.8-win32-unicode-2.8.12.1-py27.exe
+③robotframework         地址：https://pypi.python.org/pypi/robotframework
+即RF框架本身 
+④robotframework-ride  地址：https://pypi.python.org/pypi/robotframework-ride
+robotFramework的IDE界面，即机器人
+⑤selenium2library       地址：https://pypi.python.org/pypi/robotframework-selenium2library
+selenium2测试库，基于webdriver驱动
+UI自动化必备，基于python封装而成的关键字库。
+⑥decorator                   Selenium2Library库的依赖库。https://pypi.python.org/pypi/decorator
+⑦docutils                      Selenium2Library库的依赖库。https://pypi.python.org/pypi/docutils
+⑧selenium                   原生python库。https://pypi.python.org/pypi/selenium
+⑨SeleniumLibrary        Selenium2Library库的依赖库 https://github.com/robotframework/SeleniumLibrary/releases
+
+注：除python 外，其他源码包均未给出版本，因更新较快，在对应地址页面下载最新版本即可；
+
+二、安装；
+顺序：①②③④⑥⑦⑧⑨⑤
+①②双击安装即可；
+③④⑥⑦⑧⑨⑤的安装操作一样：
+将下载的tar.gz包解压成文件夹后，cmd界面进入该文件夹目录（有setup.py的目录）
+输入python setup.py install进行安装即可。
+如果提示python不是命令，请配置path环境变量。
+
+注：
+1.检查robotframework 是否安装成功 \Python27\Lib\site-packages 出现robotframework-3.0-py2.7.egg 即可；
+2.Ride安装成功标志：python的安装路径\Python27\Scripts 出现ride.py 文件；
+
+三、检验
+1.双击ride.py  进入ride界面，按F5（查找关键字），有如图选项则代表selenium2library库安装成功：
+
+接下来便可进行脚本编写与执行。
+
+tips:
+建ride的桌面快捷方式：
+第一步，在桌面点击鼠标右键，新建一个“快捷方式”，在弹出框输入：C:\Python27\pythonw.exe -c "from robotide import main; main()"并点击下一步；
+第二步，找到ride路径随你任意起一个名字，建议使用“RIDE”较为正规,并点击“完成”；
+第三步，创建之后更改快捷键图标:单击快捷方式右键--属性--修改图标
+选择机器人图标位置:C:\Python27\Lib\site-packages\robotide\widgets\robot.ico
+
+ride.py 运行是会闪动一会命令行窗口，如果不想出现这个窗口。可以把 ride.py 改为 ride.pyw即可
+
