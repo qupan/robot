@@ -347,12 +347,10 @@ py输入礼拜四
     #参数${locator}是输入框的 定位方式
 
 读取excel数据
-    [Arguments]    ${name}
-    ${x}    Set Variable    ${CURDIR}
-    ${x1}    Set Variable    ${x.split('\word')[0]}
-    ${excel_address}    连接字符串    ${x1}    \\data\\${name}.xlsx    #得到excel存放地址
-    @{z}    read_excel    ${excel_address}
-    Set Global Variable    ${data}    ${z}
+    [Arguments]    ${excel_name}    ${index}=0
+    ${addr}    Evaluate    str(pathlib.Path('${CURDIR}').parent/'data/${excel_name}.xlsx')    pathlib
+    @{z}    Read Excel Data    ${addr}
+    Set Global Variable    ${data}    ${z[${index}]}
     #读取excel的数据    参数${x}为：excel存放地址    参数${y}：为excel的名字
 
 用户字典
