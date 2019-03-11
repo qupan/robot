@@ -1,12 +1,9 @@
 *** Settings ***
-Library           Selenium2Library
+Library           Selenium2Library    timeout=30
 Library           DateTime
-Library           DatabaseLibrary
 Library           Collections
 Library           String
-Library           RequestsLibrary
 Library           XML
-Library           ExcelLibrary
 Library           OperatingSystem
 Library           BuiltIn
 Library           String
@@ -14,34 +11,69 @@ Library           Process
 Library           Dialogs
 Library           Screenshot
 Library           Telnet
-Library           SudsLibrary
 Library           MyKeyword.py
+Resource          message.txt
 
 *** Keywords ***
-谷歌后台浏览器
-    [Arguments]    ${url}
-    ${options}    MyKeyword.Create Headlesschrome Options
-    Create Webdriver    Chrome    chrome_options=${options}
-    Maximize Browser Window
-    Go To    ${url}
-    reload page
+等待元素出现
+    [Arguments]    ${locator}
+    wait until page contains element    ${locator}    30    page not contains element
+    wait until element is visible    ${locator}    30    element is not visible
+    #参数${locator}为定位方式
+
+得到所有元素
+    [Arguments]    ${locator}
+    [Documentation]    得到一组元素，返回一个元素列表；
+    ...    参数${locator}：是元素定位
+    wait until page contains element    ${locator}    30    page not contains element
+    @{element}    Get WebElements    ${locator}
+    [Return]    @{element}
 
 退出驱动
-    [Documentation]    运行完毕后关闭浏览器 的驱动 （ie和谷歌）
-    关闭所有浏览器
+    [Documentation]    退出驱动，自动判断是Window还是Linux环境
+    ...    关闭：谷歌、IE、火狐的驱动，防止驱动未关出现问题
+    ${addr}    Evaluate    type(pathlib2.Path())    pathlib2
+    Run Keyword If    "${addr}" == "<class 'pathlib2.WindowsPath'>"    Win_Kill
+    Run Keyword If    "${addr}" == "<class 'pathlib2.PosixPath'>"    Linux_Kill
+
+Win_Kill
+    [Documentation]    Window环境中运行完毕后关闭浏览器 的驱动 （ie和谷歌）
+    Close All Browsers
     evaluate    os.system('taskkill /f /im IEDriverServer.exe')    os
     evaluate    os.system('taskkill /f /im chromedriver.exe')    os
     evaluate    os.system('taskkill /f /im geckodriver.exe')    os
 
+Linux_Kill
+    [Documentation]    Linux环境中运行完毕后关闭谷歌浏览器的驱动
+    Close All Browsers
+    Comment    evaluate    os.system('killall chrome')    os
+    Comment    evaluate    os.system('killall chromedriver')    os
+
 关闭进程
     [Documentation]    运行用例前，关闭所有的 浏览器（ie，火狐，谷歌）
+    ...    针对特殊场景，跑用例之前必须关掉所有的浏览器
     evaluate    os.system('taskkill /f /im firefox.exe')    os
     evaluate    os.system('taskkill /f /im chrome.exe')    os
     evaluate    os.system('taskkill /f /im iexplore.exe')    os
 
+谷歌后台浏览器
+    [Arguments]    ${url}
+    [Documentation]    使用谷歌后台浏览器运行用例，现在不怎么用了，最新版的robotframework中已经支持谷歌和火狐后后运行的模式了，很简单
+    ${options}    MyKeyword.Create Headlesschrome Options
+    Create Webdriver    Chrome    chrome_options=${options}
+    Go To    ${url}
+    reload page
+
 打开浏览器
-    [Arguments]    ${url}    ${browser}
-    [Documentation]    打开浏览器，参数${url}:是网址，参数${browser}：是浏览器（ie，gc,ff）
+    [Arguments]    ${url}    ${browser}=headlesschrome
+    [Documentation]    打开浏览器，参数${url}输入的是网址
+    ...    参数${browser}：是浏览器类型，默认使用谷歌后台运行
+    ...    参数：
+    ...    IE浏览器 --- ie
+    ...    谷歌浏览器 --- gc
+    ...    火狐浏览器 --- ff
+    ...    谷歌后台模式 --- headlesschrome
+    ...    火狐后台模式 --- headlessfirefox
     open browser    ${url}    ${browser}
     Maximize Browser Window
     reload page
@@ -51,7 +83,7 @@ Library           MyKeyword.py
     reload page
 
 关闭浏览器
-    [Documentation]    关闭当前浏览器
+    [Documentation]    关闭浏览器
     sleep    2
     close browser
 
@@ -59,268 +91,362 @@ Library           MyKeyword.py
     [Documentation]    关闭所有浏览器
     close all browsers
 
-点击元素
-    [Arguments]    ${locator}
-    等待元素出现    ${locator}
-    focus    ${locator}
-    click element    ${locator}
-    #参数${locator}：是定位 方式    例如：id:kw
+鼠标悬停
+    [Arguments]    ${locator}    ${index}=0
+    @{el}    得到所有元素    ${locator}
+    Set Focus To Element    @{el}[${index}]
+    Mouse Over    @{el}[${index}]
 
-点击列表
-    [Arguments]    ${locator}    ${number}
-    #等待元素出现    ${locator}
-    @{x}    get webelements    ${locator}
-    focus    @{x}[${number}]
-    click element    @{x}[${number}]
-    #参数${locator}：是定位 方式    参数：${number}是要点击的 第几个元素，的索引值
+点击元素
+    [Arguments]    ${locator}    ${index}=0
+    [Documentation]    点击元素。
+    ...    参数${locator}：是定位 方式 例如：id=kw
+    ...    ${index}是元素索引：当定位是一组元素时候使用
+    @{el}    得到所有元素    ${locator}
+    Set Focus To Element    @{el}[${index}]
+    : FOR    ${i}    IN RANGE    7000
+    \    ${msg}    Run Keyword And Ignore Error    click element    @{el}[${index}]
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
 
 点击按钮
-    [Arguments]    ${locator}
-    等待元素出现    ${locator}
-    focus    ${locator}
-    click button    ${locator}
-    #参数${locator}：是 定位方式
+    [Arguments]    ${locator}    ${index}=0
+    [Documentation]    参数${locator}：是定位 方式 例如：id=kw
+    ...    ${index}是元素索引：当定位是一组元素时候使用，
+    @{el}    得到所有元素    ${locator}
+    Set Focus To Element    @{el}[${index}]
+    : FOR    ${i}    IN RANGE    7000
+    \    ${msg}    Run Keyword And Ignore Error    Click Button    @{el}[${index}]
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
 
 点击链接
-    [Arguments]    ${locator}
-    等待元素出现    ${locator}
-    focus    ${locator}
-    click link    ${locator}
-    #参数${locator}：是定位 方式
+    [Arguments]    ${locator}    ${index}=0
+    [Documentation]    参数${locator}：是定位 方式 例如：id=kw
+    ...    ${index}是元素索引：当定位是一组元素时候使用，
+    @{el}    得到所有元素    ${locator}
+    Set Focus To Element    @{el}[${index}]
+    : FOR    ${i}    IN RANGE    7000
+    \    ${msg}    Run Keyword And Ignore Error    Click Link    @{el}[${index}]
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
 
 双击
-    [Arguments]    ${locator}
-    等待元素出现    ${locator}
-    focus    ${locator}
-    double click element    ${locator}
-    #参数${locator}：是定位 方式
+    [Arguments]    ${locator}    ${index}=0
+    [Documentation]    参数${locator}：是定位 方式 例如：id=kw
+    ...    ${index}是元素索引：当定位是一组元素时候使用，
+    @{el}    得到所有元素    ${locator}
+    Set Focus To Element    @{el}[${index}]
+    : FOR    ${i}    IN RANGE    7000
+    \    ${msg}    Run Keyword And Ignore Error    double click element    @{el}[${index}]
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
 
 输入文本
-    [Arguments]    ${locator}    ${text}
-    等待元素出现    ${locator}
-    clear element text    ${locator}
-    input text    ${locator}    ${text}
-    #参数${locator}：是定位 方式    参数${text}：是要输入的文本
-
-输入文本列表
-    [Arguments]    ${locator}    ${index}    ${text}
-    #等待元素出现    ${locator}
-    等待    2
-    @{x}    get webelements    ${locator}
-    focus    @{x}[${index}]
-    input text    @{x}[${index}]    ${text}
-    press key    @{x}[${index}]    \\13
-    #参数${locator}：是定位 方式    参数${text}：是要输入的文本
-
-ie输入文本
-    [Arguments]    ${locator}    ${text}
-    等待元素出现    ${locator}
-    ${t1}    get current date
-    assign id to element    ${locator}    ${t1}
-    execute javascript    window.document.getElementById('${t1}').value='${text}'
-    #js定位是使用css定位的    参数${locator}:是定位方式    参数${text}：是要输入的文本
+    [Arguments]    ${locator}    ${text}    ${index}=0
+    [Documentation]    参数${locator}：是定位 方式，例如：id=kw；
+    ...    ${text}是输入的文本；
+    ...    ${index}是元素索引：当定位是一组元素时候使用
+    @{el}    得到所有元素    ${locator}
+    Set Focus To Element    @{el}[${index}]
+    clear element text    @{el}[${index}]
+    : FOR    ${i}    IN RANGE    7000
+    \    ${msg}    Run Keyword And Ignore Error    input text    @{el}[${index}]    ${text}
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
 
 点击radio
     [Arguments]    ${group_name}    ${value}
-    [Documentation]    \#参数${group_name}：是 标签下name的值 参数${value}：是标签下value 的值
-    wait until page contains element    css=input[name='${group_name}']    10    page not contains element
+    [Documentation]    参数${group_name}：是 标签下name的值，参数${value}：是标签下value 的值
+    ...    ，点击小圆圈
+    wait until page contains element    name=${group_name}    30    page not contains element
     select radio button    ${group_name}    ${value}
 
 点击checkbox
-    [Arguments]    ${locator}
-    等待元素出现    ${locator}
-    select checkbox    ${locator}
-    #参数${locator}为定位方式
+    [Arguments]    ${locator}    ${index}=0
+    [Documentation]    点击复选框；参数${locator}：是定位 方式 例如：id=kw
+    ...    ${index}是元素索引：当定位是一组元素时候使用
+    @{el}    得到所有元素    ${locator}
+    Set Focus To Element    @{el}[${index}]
+    select checkbox    @{el}[${index}]
+
+取消checkbox
+    [Arguments]    ${locator}    ${index}=0
+    [Documentation]    取消选择复选框；参数${locator}：是定位 方式 例如：id=kw
+    ...    ${index}是元素索引：当定位是一组元素时候使用
+    @{el}    得到所有元素    ${locator}
+    Set Focus To Element    @{el}[${index}]
+    unselect checkbox    @{el}[${index}]
 
 下拉框
-    [Arguments]    ${locator}    ${value}
-    等待元素出现    ${locator}
-    focus    ${locator}
-    select from list by value    ${locator}    ${value}
-    #参数${locator}：是定位 方式    参数${value}：是标签option中 \ value的值
-    #点击列表下拉框
+    [Arguments]    ${locator}    ${value}    ${index}=0
+    [Documentation]    使用标签值选择列表下拉框；
+    ...    参数${locator}：是定位 方式；
+    ...    参数${value}：是标签option中value的值；
+    ...    ${index}是元素索引：当定位是一组元素时候使用；
+    @{el}    得到所有元素    ${locator}
+    Set Focus To Element    @{el}[${index}]
+    select from list by value    @{el}[${index}]    ${value}
 
 下拉框index
-    [Arguments]    ${locator}    ${index}
-    等待元素出现    ${locator}
-    focus    ${locator}
-    select from list by index    ${locator}    ${index}
-    #参数${locator}：是定位 方式    参数${index}：是标签option索引值
-    #点击列表下拉框
+    [Arguments]    ${locator}    ${index}    ${number}=0
+    [Documentation]    使用索引值选择列表下拉框；
+    ...    参数${locator}：是定位 方式；
+    ...    参数${index}：是标签中的索引的值；
+    ...    ${number}是元素索引：当定位是一组元素时候使用；
+    @{el}    得到所有元素    ${locator}
+    Set Focus To Element    @{el}[${number}]
+    select from list by index    @{el}[${number}]    ${index}
 
 jq点击
-    [Arguments]    ${x}
-    等待元素出现    css:${x[1:-1]}
-    focus    css:${x[1:-1]}
-    execute javascript    $(${x}).click()
-    #jq定位是使用css定位的    参数${x}:是定位的后半部分
-    #例如：'#kw',必须使用 引号括起来    不用写'css:'或者'css='
+    [Arguments]    ${css}    ${index}=0
+    [Documentation]    jq定位是使用css语法；
+    ...    参数${css}:是定位；例如：'#kw',必须使用 引号括起来；
+    ...    参数${index}：是索引，当得到一组元素时候使用；
+    wait until page contains element    css:${css[1:-1]}    30    page not contains element
+    Set Focus To Element    css:${css[1:-1]}
+    : FOR    ${i}    IN RANGE    7000
+    \    ${status}    Run Keyword And Ignore Error    execute javascript    $(${css}).eq(${index}).click()
+    \    Exit For Loop If    "${status[0]}" == "PASS"
 
 jq双击
-    [Arguments]    ${x}
-    等待元素出现    css:${x[1:-1]}
-    focus    css:${x[1:-1]}
-    execute javascript    $(${x}).dblclick()
-    #jq定位是使用css定位的    参数${x}:是定位的后半部分
-    #例如：'#kw',必须使用 引号括起来    不用写'css:'或者'css='
+    [Arguments]    ${css}    ${index}=0
+    [Documentation]    jq定位是使用css语法；
+    ...    参数${css}:是定位；例如：'#kw',必须使用 引号括起来；
+    ...    参数${index}：是索引，当得到一组元素时候使用；
+    wait until page contains element    css:${css[1:-1]}    30    page not contains element
+    Set Focus To Element    css:${css[1:-1]}
+    : FOR    ${i}    IN RANGE    7000
+    \    ${status}    Run Keyword And Ignore Error    execute javascript    $(${css}).eq(${index}).dblclick()
+    \    Exit For Loop If    "${status[0]}" == "PASS"
 
 jq输入
-    [Arguments]    ${x}    ${y}
-    [Documentation]    \#jq定位是使用css定位的 参数${x}:是定位的后半部分    #例如：'#kw',必须使用 引号括起来    不用写'css:'或者'css='
-    等待元素出现    css:${x[1:-1]}
-    focus    css:${x[1:-1]}
-    execute javascript    $('${x[1:-1]}').val('${y}')
-    #jq定位是使用css定位的    参数${x}:是定位的后半部分    参数${y}是要输入的文本
-    #例如：'#kw',必须使用 引号括起来    不用写'css:'或者'css='
+    [Arguments]    ${css}    ${text}    ${index}=0
+    [Documentation]    jq定位是使用css语法；
+    ...    参数${css}:是定位；例如：'#kw',必须使用 引号括起来；
+    ...    参数${text}：是要输入的文本
+    ...    参数${index}：是索引，当得到一组元素时候使用；
+    wait until page contains element    css:${css[1:-1]}    30    page not contains element
+    Set Focus To Element    css:${css[1:-1]}
+    : FOR    ${i}    IN RANGE    7000
+    \    ${status}    Run Keyword And Ignore Error    execute javascript    $(${css}).eq(${index}).val('${text}')
+    \    Exit For Loop If    "${status[0]}" == "PASS"
+
+jq得到文本
+    [Arguments]    ${css}    ${index}=0
+    [Documentation]    jq定位是使用css语法；
+    ...    参数${css}:是定位；例如：'#kw',必须使用 引号括起来；
+    ...    参数${index}：是索引，当得到一组元素时候使用；
+    wait until page contains element    css:${css[1:-1]}    30    page not contains element
+    Set Focus To Element    css:${css[1:-1]}
+    : FOR    ${i}    IN RANGE    7000
+    \    ${length}    execute javascript    return $(${css}).eq(${index}).text().length
+    \    Exit For Loop If    "${length}" > "0"
+    ${text}    execute javascript    return $(${css}).eq(${index}).text()
+    [Return]    ${text}
 
 js点击
-    [Arguments]    ${x}
-    等待元素出现    css:${x[1:-1]}
-    focus    css:${x[1:-1]}
-    execute javascript    document.querySelectorAll(${x})[0].click()
-    #js定位是使用css定位的    参数${x}:是定位的后半部分
-    #例如：'#kw',必须使用 引号括起来    不用写'css:'或者'css='
-
-js点击1
-    [Arguments]    ${x}    ${y}
-    等待元素出现    css:${x[1:-1]}
-    focus    css:${x[1:-1]}
-    execute javascript    document.querySelectorAll(${x})[${y}].click()
-    #js定位是使用css定位的    参数${x}:是定位的后半部分    参数${y}是要点击的第几个数字
-    #例如：'#kw',必须使用 引号括起来    不用写'css:'或者'css='
+    [Arguments]    ${css}    ${index}=0
+    [Documentation]    js定位是使用css语法；
+    ...    参数${css}:是定位；例如：'#kw',必须使用 引号括起来；
+    ...    参数${index}：是索引，当得到一组元素时候使用；
+    wait until page contains element    css:${css[1:-1]}    30    page not contains element
+    Set Focus To Element    css:${css[1:-1]}
+    : FOR    ${i}    IN RANGE    7000
+    \    ${status}    Run Keyword And Ignore Error    execute javascript    document.querySelectorAll(${css})[${index}].click()
+    \    Exit For Loop If    "${status[0]}" == "PASS"
 
 js输入
-    [Arguments]    ${locator}    ${text}
-    等待元素出现    ${locator}
-    ${t1}    get current date
-    assign id to element    ${locator}    ${t1}
-    execute javascript    window.document.getElementById('${t1}').value='${text}'
-    #js定位是使用css定位的    参数${locator}:是定位方式    参数${text}：是要输入的文本
+    [Arguments]    ${css}    ${text}    ${index}=0
+    [Documentation]    js定位是使用css语法；
+    ...    参数${css}:是定位；例如：'#kw',必须使用 引号括起来；
+    ...    参数${text}：是输入的文本；
+    ...    参数${index}：是索引，当得到一组元素时候使用；
+    wait until page contains element    css:${css[1:-1]}    30    page not contains element
+    Set Focus To Element    css:${css[1:-1]}
+    : FOR    ${i}    IN RANGE    7000
+    \    ${status}    Run Keyword And Ignore Error    execute javascript    document.querySelectorAll(${css})[${index}].value='${text}'
+    \    Exit For Loop If    "${status[0]}" == "PASS"
 
-js输入1
-    [Arguments]    ${locator}    ${index}    ${text}
-    #等待元素出现    ${locator}
-    execute javascript    document.querySelectorAll(${locator})[${index}].value='${text}'
-    #js定位是使用css定位的    参数${locator}:是定位方式    参数${text}：是要输入的文本
+js得到文本
+    [Arguments]    ${css}    ${index}=0
+    [Documentation]    js定位是使用css语法；
+    ...    参数${css}:是定位；例如：'#kw',必须使用 引号括起来；
+    ...    参数${index}：是索引，当得到一组元素时候使用；
+    wait until page contains element    css:${css[1:-1]}    30    page not contains element
+    Set Focus To Element    css:${css[1:-1]}
+    : FOR    ${i}    IN RANGE    7000
+    \    ${length}    execute javascript    return document.querySelectorAll(${css})[${index}].innerText.length
+    \    Exit For Loop If    "${length}" > "0"
+    ${text}    execute javascript    return document.querySelectorAll(${css})[${index}].innerText
+    [Return]    ${text}
 
 div滚动条
-    [Arguments]    ${x}    ${number}
-    等待元素出现    css:${x[1:-1]}
-    focus    css:${x[1:-1]}
-    execute javascript    document.querySelector(${x}).scrollTop=${number}
-    #js定位是使用css定位的    参数${x}:是定位的后半部分    参数${number}：是滚动的位置 ，输入的值
-    #例如：'#kw',必须使用引号 括起来    不用写'css:'或者'css='
+    [Arguments]    ${css}    ${number}    ${index}=0
+    [Documentation]    默认上下移动div内嵌式hi滚动条；
+    ...    参数${css}:是定位；例如：'#kw',必须使用 引号括起来；
+    ...    参数${number}：是滚动的位置 ，输入的值，例如：1000；
+    ...    参数${index}：是索引，当得到一组元素时候使用；
+    wait until page contains element    css:${css[1:-1]}    30    page not contains element
+    Set Focus To Element    css:${css[1:-1]}
+    execute javascript    document.querySelectorAll(${css})[${index}].scrollTop=${number}
 
 div滚动条left
-    [Arguments]    ${x}    ${number}
-    等待元素出现    css:${x[1:-1]}
-    focus    css:${x[1:-1]}
-    execute javascript    document.querySelector(${x}).scrollLeft=${number}
-    #js定位是使用css定位的    参数${x}:是定位的后半部分    参数${number}：是滚动的位置 ，输入的值
-    #例如：'#kw',必须使用引号 括起来    不用写'css:'或者'css='
+    [Arguments]    ${css}    ${number}    ${index}=0
+    [Documentation]    默认左右移动div内嵌式hi滚动条；
+    ...    参数${css}:是定位；例如：'#kw',必须使用 引号括起来；
+    ...    参数${number}：是滚动的位置 ，输入的值，例如：1000；
+    ...    参数${index}：是索引，当得到一组元素时候使用；
+    wait until page contains element    css:${css[1:-1]}    30    page not contains element
+    Set Focus To Element    css:${css[1:-1]}
+    execute javascript    document.querySelectorAll(${css})[${index}].scrollLeft=${number}
 
 滚动条
-    [Arguments]    ${x}
-    execute javascript    document.documentElement.scrollTop=${x}
+    [Arguments]    ${number}
+    [Documentation]    针对整个页面的滚动条；
+    ...    参数${number}：是移动的位置，输入数字，例如：10000
+    execute javascript    document.documentElement.scrollTop=${number}
 
 打开新页面
     [Arguments]    ${url}
+    [Documentation]    打开新的网址，参数${url} ：是网址
     sleep    3
     execute javascript    window.open('${url}')
-    #打开新的网址，参数${url} ：是网址
 
 切换frame
     [Arguments]    ${locator}
+    [Documentation]    切换到frame框，参数${locator}：是定位方式；
+    ...    如果有id和name的话直接写： 两个属性的值即可；
+    ...    例如id=kw，name=su，直接写 kw或su即可
     等待元素出现    ${locator}
-    focus    ${locator}
+    Set Focus To Element    ${locator}
     select frame    ${locator}
-    #切换到frame框，    参数${locator}：是定位方式，
-    #如果有id和name的话直接写： 两个属性的值即可    例如id=kw，name=su，直接写 kw或su即可
 
 返回frame
+    [Documentation]    返回主frame
     Unselect Frame
-    #返回主frame
 
 得到窗口
+    [Documentation]    得到当前所有窗口句柄的列表；
+    ...    并将@{handle}的值返回
     sleep    3
-    @{x}    get window handles
-    #得到当前所有窗口句柄的 列表    并将@{x}的值返回
-    [Return]    @{x}
+    @{handle}    get window handles
+    [Return]    @{handle}
 
 切换窗口
     [Arguments]    ${x}    ${y}
+    [Documentation]    要跳转到第3个窗口，输入3个窗口的列表和2个窗口的列表；
+    ...    要跳转到第2个窗口，输入2个窗口的列表和1个窗口的列表；
+    ...    要跳转到第1个窗口，输入1个窗口的列表和1个空的列表；
+    ...    两个列表的前后没有关系
     ${z}    evaluate    [list(set(${x})-set(${y}))[0] if len(${x}) > len(${y}) else list(set(${y})-set(${x}))[0]]
     sleep    3
     select window    ${z[0]}
     maximize browser window
-    #要跳转到第三个窗口    输入三个窗口的列表和两个窗口 的列列表
-    #两个列表的前后没有关系
 
 回到主窗口
+    [Documentation]    返回到主窗口
     sleep    2
     select window    main
-    #返回第一个页面
 
 跳到新窗口
+    [Documentation]    跳转到新窗口，只针对有两个页面的情况
     sleep    2
     select window    new
-    Maximize Browser Window
-    #跳转到新窗口
 
 窗口最大化
     maximize browser window
 
 关闭窗口
     close window
-    #关闭当前窗口
+
+截图
+    [Arguments]    ${addr}=default
+    ${time}    evaluate    time.strftime('%Y.%m.%d.%H.%M.%S')    time
+    ${addr_first}    evaluate    [str(pathlib2.Path('${CURDIR}').parent/'screenshot') if '${addr}' == 'default' else str(pathlib2.Path('${CURDIR}').parent/'screenshot/${addr}')]    pathlib2
+    Comment    evaluate    pathlib2.Path('${addr_first[0]}').mkdir(parents=True,exist_ok=True)    pathlib2
+    Selenium2Library.Capture Page Screenshot    ${addr_first[0]}/${time}.png
+
+回车
+    [Arguments]    ${locator}
+    press key    ${locator}    \\13
+
+上传
+    [Arguments]    ${locator}    ${name}
+    Wait Until Page Contains Element    ${locator}
+    ${x}    Set Variable    ${CURDIR}
+    ${x1}    Set Variable    ${x.split('\word')[0]}
+    ${excel_address}    连接字符串    ${x1}    \\data\\${name}    #得到excel存放地址
+    Choose File    ${locator}    ${excel_address}
+    等待    1
+
+点击弹框
+    confirm action    #点击弹框中的确定
 
 检查点
-    [Arguments]    ${locator}    ${text}    ${message}=error
+    [Arguments]    ${locator}    ${text}    ${message}=not contains
+    [Documentation]    验证文本参数${locator} 为定位方式，得到元素的文本；
+    ...    参数${text}：是预期结果；
+    ...    参数${message}：是错误信息，默认是not contains
     等待元素出现    ${locator}
-    focus    ${locator}
-    ${x}    get text    ${locator}
+    Set Focus To Element    ${locator}
+    ${x}    得到文本    ${locator}
     log    ${x.replace('\n',',')}    #打印实际结果
-    log    ${text.replace('\n',',')}    #打印预期结果
-    should contain    ${x}    ${text}    msg=${message}
-    #验证文本参数${locator} 为定位方式    参数${text}：是要输入的文本
+    Should Not Be Empty    ${x}    get value is empty
+    should contain    ${text}    ${x.replace('\n',',')}    msg=${message}
+
+结果对比
+    [Arguments]    ${actual}    ${expect}
+    [Documentation]    ${actual}是实际结果；
+    ...    ${expect}是预期结果；
+    log    ${actual.replace('\n',',')}    #打印实际结果
+    Should Not Be Empty    ${actual}    get value is empty
+    should contain    ${expect}    ${actual}    msg=错误，预期结果和实际 结果不相同
+
+包含检查点
+    [Arguments]    ${text}
+    [Documentation]    参数${text}：是等待页面包含的文本
+    Wait Until Page Contains    ${text}
+    log    ${text}    #如果页面有预期的文本打印出实际结果
 
 得到文本
-    [Arguments]    ${locator}
-    等待元素出现    ${locator}
-    focus    ${locator}
-    ${x}    get text    ${locator}
-    #得到页面中的文本    参数${locator}：是定位方式    最后将文本${x}返回
-    [Return]    ${x}
+    [Arguments]    ${locator}    ${index}=0
+    [Documentation]    得到页面元素的文本；
+    ...    参数${locater}是元素的定位
+    @{el}    得到所有元素    ${locator}
+    Set Focus To Element    @{el}[${index}]
+    : FOR    ${i}    IN RANGE    7000
+    \    ${text}    get text    @{el}[${index}]
+    \    ${len}    得到长度    ${text}
+    \    Exit For Loop If    "${len}" > "0"
+    ${text}    get text    @{el}[${index}]
+    [Return]    ${text}
 
 得到长度
     [Arguments]    ${x}
+    [Documentation]    得到字符串的长度，并返回；
+    ...    参数使用${}的方式；
     ${y}    Get Length    ${x}
     [Return]    ${y}
 
 得到属性
-    [Arguments]    ${locator}    ${name}
-    等待元素出现    ${locator}
-    focus    ${locator}
-    ${atrr}    Selenium2Library.Get Element Attribute    ${locator}    ${name}
+    [Arguments]    ${locator}    ${name}    ${index}=0
+    [Documentation]    参数${locator}：是定位 方式，例如：id=kw；
+    ...    参数${name}：是要得到的属性名称；
+    ...    ${index}是元素索引：当定位是一组元素时候使用；
+    @{el}    得到所有元素    ${locator}
+    Set Focus To Element    @{el}[${index}]
+    ${atrr}    Selenium2Library.Get Element Attribute    @{el}[${index}]    ${name}
     [Return]    ${atrr}
 
 连接字符串
     [Arguments]    ${str1}    ${str2}
+    [Documentation]    连接字符串，输入连个参数，返回一串字符
     ${text}    Catenate    SEPARATOR=    ${str1}    ${str2}
     [Return]    ${text}
 
-得到所有元素
-    [Arguments]    ${locator}
-    wait until page contains element    ${locator}    10    page not contains element
-    @{element}    Get WebElements    ${locator}
-    [Return]    @{element}
-
 rf输入时间
     [Arguments]    ${locator}    ${number}
+    [Documentation]    \#给input标签输入日期 参数${locator} 是：定位方式 参数${number}：是给当前时间 加或减少的天数    #增加3天：输入数字3即可    减少3天：输入-3即可
     ${t1}    get current date
     ${t2}    add time to date    ${t1}    ${number}days
     等待元素出现    ${locator}
-    focus    ${locator}
+    Set Focus To Element    ${locator}
     assign id to element    ${locator}    ${t1}
     execute javascript    window.document.getElementById('${t1}').value='${t2[0:10]}'
     #给input标签输入日期    参数${locator} 是：定位方式    参数${number}：是给当前时间 加或减少的天数
@@ -348,23 +474,13 @@ py输入礼拜四
 
 读取excel数据
     [Arguments]    ${excel_name}    ${index}=0
-    ${addr}    Evaluate    str(pathlib.Path('${CURDIR}').parent/'data/${excel_name}.xlsx')    pathlib
+    [Documentation]    读取excel的数据，参数${excel_name} 为：excel的名称；
+    ...    参数 ${index}=0：excel工作表索引，默认是第一个工作表；
+    ...    读取出来的数据默认是一个二维列表
+    ${addr}    Evaluate    str(pathlib2.Path('${CURDIR}').parent/'data/${excel_name}.xlsx')    pathlib2
     @{z}    Read Excel Data    ${addr}
     Set Global Variable    ${data}    ${z[${index}]}
-    #读取excel的数据    参数${x}为：excel存放地址    参数${y}：为excel的名字
-
-用户字典
-    import library    d:/robot/data/user.py
-    @{x}    user
-    set global variable    @{user_data}    @{x}
-
-取消隐藏
-    [Arguments]    ${x}
-    等待元素出现    css:${x[1:-1]}
-    focus    css:${x[1:-1]}
-    execute javascript    document.querySelectorAll(${x})[0].style.type="text"
-    #js定位是使用css定位的    参数${x}:是定位的后半部分
-    #例如：'#kw',必须使用 引号括起来    不用写'css:'或者'css='
+    [Return]    @{z[${index}]}
 
 结束打开报告
     打开浏览器    file:///D:/robot/report/log.html    gc
@@ -379,22 +495,9 @@ py输入礼拜四
     sleep    ${x}
     #参数${number}为输入 的秒数
 
-等待元素出现
-    [Arguments]    ${locator}
-    wait until page contains element    ${locator}    10    page not contains element
-    wait until element is visible    ${locator}    10    element is not visible
-    #参数${locator}为定位方式
-
-回车
-    [Arguments]    ${locator}
-    press key    ${locator}    \\13
-
 解压文件
     [Arguments]    ${x}    ${y}
     evaluate    os.system("WinRAR x ${x} ${y}")    os
-
-点击弹框
-    confirm action    #点击弹框中的确定
 
 HR用户名
     [Arguments]    ${x}
@@ -406,23 +509,9 @@ HR用户名
     ${user}    read_oracle    select USER_NOTESNAME,USER_SHORTNAME from v_emp where USER_NOTESNAME=    ${x}
     [Return]    ${user}
 
-鼠标悬停
-    [Arguments]    ${locator}
-    等待元素出现    ${locator}
-    Mouse Over    ${locator}
-
 得到当前网址
     ${url}    Get Location
     [Return]    ${url}
-
-上传
-    [Arguments]    ${locator}    ${name}
-    Wait Until Page Contains Element    ${locator}
-    ${x}    Set Variable    ${CURDIR}
-    ${x1}    Set Variable    ${x.split('\word')[0]}
-    ${excel_address}    连接字符串    ${x1}    \\data\\${name}    #得到excel存放地址
-    Choose File    ${locator}    ${excel_address}
-    等待    1
 
 新会话
     [Arguments]    ${host}
@@ -439,15 +528,9 @@ HR用户名
     ${params}    Convert Dict    ${message}
     [Return]    ${params}
 
-接口数据检查点
-    [Arguments]    ${resp}    ${actual_index}    ${expect_code}    ${expect_data}
-    ${x}    to json    ${resp.content}    #将返回的数据格式化成 json格式
-    ${actual}    Evaluate    json.dumps(${x${actual_index}},encoding='UTF-8',ensure_ascii=False)    json
-    ${expect}    Evaluate    json.dumps(${expect_data},encoding='UTF-8',ensure_ascii=False)    json
-    ${result}    Evaluate    ${actual}==${expect}
-    ${x}    Catenate    SEPARATOR=,    ${resp.status_code}    ${actual}    #连接实际的状态码 和数据
-    ${y}    Catenate    SEPARATOR=,    ${expect_code}    ${expect_data}    #连接预期的的状态码 和数据
-    log    ${x.replace('\n',',')}    #打印实际结果
-    log    ${y.replace('\n','').replace(' ','')}    #打印预期结果
-    Should Be Equal As Strings    ${resp.status_code}    ${expect_code}    #对比返回码的正确性
-    Should Be Equal As Strings    ${result}    True    #对比数据正确性
+json转换
+    [Arguments]    ${dict}
+    [Documentation]    输入一组数据装换成json格式，例子：{'name': False, 'age': 26, 'aa': True, 'bb': None, 'cc': 'jksdfnksnk', 'dd': '狮子座'}
+    ${x}    evaluate    ${dict}
+    ${json}    evaluate    json.dumps(${x},indent=4,ensure_ascii=False)    json
+    [Return]    ${json}
