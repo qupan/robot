@@ -26,6 +26,7 @@ Resource          message.txt
     [Documentation]    得到一组元素，返回一个元素列表；
     ...    参数${locator}：是元素定位
     wait until page contains element    ${locator}    30    page not contains element
+    wait until element is visible    ${locator}    30    element is not visible
     @{element}    Get WebElements    ${locator}
     [Return]    @{element}
 
@@ -94,7 +95,7 @@ Linux_Kill
 鼠标悬停
     [Arguments]    ${locator}    ${index}=0
     @{el}    得到所有元素    ${locator}
-    Set Focus To Element    @{el}[${index}]
+    Comment    Set Focus To Element    @{el}[${index}]
     Mouse Over    @{el}[${index}]
 
 点击元素
@@ -103,7 +104,7 @@ Linux_Kill
     ...    参数${locator}：是定位 方式 例如：id=kw
     ...    ${index}是元素索引：当定位是一组元素时候使用
     @{el}    得到所有元素    ${locator}
-    Set Focus To Element    @{el}[${index}]
+    Comment    Set Focus To Element    @{el}[${index}]
     : FOR    ${i}    IN RANGE    7000
     \    ${msg}    Run Keyword And Ignore Error    click element    @{el}[${index}]
     \    Exit For Loop If    "${msg[0]}" == "PASS"
@@ -113,7 +114,7 @@ Linux_Kill
     [Documentation]    参数${locator}：是定位 方式 例如：id=kw
     ...    ${index}是元素索引：当定位是一组元素时候使用，
     @{el}    得到所有元素    ${locator}
-    Set Focus To Element    @{el}[${index}]
+    Comment    Set Focus To Element    @{el}[${index}]
     : FOR    ${i}    IN RANGE    7000
     \    ${msg}    Run Keyword And Ignore Error    Click Button    @{el}[${index}]
     \    Exit For Loop If    "${msg[0]}" == "PASS"
@@ -123,7 +124,7 @@ Linux_Kill
     [Documentation]    参数${locator}：是定位 方式 例如：id=kw
     ...    ${index}是元素索引：当定位是一组元素时候使用，
     @{el}    得到所有元素    ${locator}
-    Set Focus To Element    @{el}[${index}]
+    Comment    Set Focus To Element    @{el}[${index}]
     : FOR    ${i}    IN RANGE    7000
     \    ${msg}    Run Keyword And Ignore Error    Click Link    @{el}[${index}]
     \    Exit For Loop If    "${msg[0]}" == "PASS"
@@ -133,7 +134,7 @@ Linux_Kill
     [Documentation]    参数${locator}：是定位 方式 例如：id=kw
     ...    ${index}是元素索引：当定位是一组元素时候使用，
     @{el}    得到所有元素    ${locator}
-    Set Focus To Element    @{el}[${index}]
+    Comment    Set Focus To Element    @{el}[${index}]
     : FOR    ${i}    IN RANGE    7000
     \    ${msg}    Run Keyword And Ignore Error    double click element    @{el}[${index}]
     \    Exit For Loop If    "${msg[0]}" == "PASS"
@@ -144,34 +145,44 @@ Linux_Kill
     ...    ${text}是输入的文本；
     ...    ${index}是元素索引：当定位是一组元素时候使用
     @{el}    得到所有元素    ${locator}
-    Set Focus To Element    @{el}[${index}]
+    Comment    Set Focus To Element    @{el}[${index}]
     clear element text    @{el}[${index}]
     : FOR    ${i}    IN RANGE    7000
     \    ${msg}    Run Keyword And Ignore Error    input text    @{el}[${index}]    ${text}
     \    Exit For Loop If    "${msg[0]}" == "PASS"
 
 点击radio
-    [Arguments]    ${group_name}    ${value}
-    [Documentation]    参数${group_name}：是 标签下name的值，参数${value}：是标签下value 的值
-    ...    ，点击小圆圈
-    wait until page contains element    name=${group_name}    30    page not contains element
-    select radio button    ${group_name}    ${value}
+    [Arguments]    ${css}    ${index}=0
+    [Documentation]    js定位是使用css语法；
+    ...    参数${css}:是定位；例如：'#kw',必须使用 引号括起来；
+    ...    参数${index}：是索引，当得到一组元素时候使用；
+    wait until page contains element    css:${css[1:-1]}    30    page not contains element
+    Comment    Set Focus To Element    css:${css[1:-1]}
+    ${time}    evaluate    time.strftime('%m%d%H%M%S')    time
+    Execute Javascript    document.querySelectorAll(${css})[${index}].setAttribute('name','radio_${time}')    #新增name的属性，如果有的话进行修改成新的
+    Execute Javascript    document.querySelectorAll(${css})[${index}].setAttribute('value','radio_${time}')    #新增value的属性，如果有的话进行修改成新的
+    : FOR    ${i}    IN RANGE    7000
+    \    ${msg}    Run Keyword And Ignore Error    select radio button    radio_${time}    radio_${time}
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
 
 点击checkbox
     [Arguments]    ${locator}    ${index}=0
     [Documentation]    点击复选框；参数${locator}：是定位 方式 例如：id=kw
     ...    ${index}是元素索引：当定位是一组元素时候使用
     @{el}    得到所有元素    ${locator}
-    Set Focus To Element    @{el}[${index}]
-    select checkbox    @{el}[${index}]
+    : FOR    ${i}    IN RANGE    7000
+    \    ${msg}    Run Keyword And Ignore Error    select checkbox    @{el}[${index}]
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
 
 取消checkbox
     [Arguments]    ${locator}    ${index}=0
     [Documentation]    取消选择复选框；参数${locator}：是定位 方式 例如：id=kw
     ...    ${index}是元素索引：当定位是一组元素时候使用
     @{el}    得到所有元素    ${locator}
-    Set Focus To Element    @{el}[${index}]
-    unselect checkbox    @{el}[${index}]
+    Comment    Set Focus To Element    @{el}[${index}]
+    : FOR    ${i}    IN RANGE    7000
+    \    ${msg}    Run Keyword And Ignore Error    unselect checkbox    @{el}[${index}]
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
 
 下拉框
     [Arguments]    ${locator}    ${value}    ${index}=0
@@ -180,7 +191,7 @@ Linux_Kill
     ...    参数${value}：是标签option中value的值；
     ...    ${index}是元素索引：当定位是一组元素时候使用；
     @{el}    得到所有元素    ${locator}
-    Set Focus To Element    @{el}[${index}]
+    Comment    Set Focus To Element    @{el}[${index}]
     select from list by value    @{el}[${index}]    ${value}
 
 下拉框index
@@ -190,7 +201,7 @@ Linux_Kill
     ...    参数${index}：是标签中的索引的值；
     ...    ${number}是元素索引：当定位是一组元素时候使用；
     @{el}    得到所有元素    ${locator}
-    Set Focus To Element    @{el}[${number}]
+    Comment    Set Focus To Element    @{el}[${number}]
     select from list by index    @{el}[${number}]    ${index}
 
 jq点击
@@ -309,13 +320,15 @@ div滚动条left
     execute javascript    window.open('${url}')
 
 切换frame
-    [Arguments]    ${locator}
+    [Arguments]    ${locator}    ${index}=0
     [Documentation]    切换到frame框，参数${locator}：是定位方式；
     ...    如果有id和name的话直接写： 两个属性的值即可；
     ...    例如id=kw，name=su，直接写 kw或su即可
-    等待元素出现    ${locator}
-    Set Focus To Element    ${locator}
-    select frame    ${locator}
+    @{el}    得到所有元素    ${locator}
+    Comment    Set Focus To Element    @{el}[${index}]
+    : FOR    ${i}    IN RANGE    7000
+    \    ${msg}    Run Keyword And Ignore Error    select frame    @{el}[${index}]
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
 
 返回frame
     [Documentation]    返回主frame
