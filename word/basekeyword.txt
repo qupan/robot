@@ -30,6 +30,26 @@ Resource          message.txt
     @{element}    Get WebElements    ${locator}
     [Return]    @{element}
 
+原生判断元素个数大于等于索引值
+    [Arguments]    ${locator}    ${index}
+    ${number}    evaluate    ${index}+1
+    :FOR    ${i}    IN RANGE    1000
+    \    @{element}    得到所有元素    ${locator}
+    \    ${len}    得到长度    ${element}
+    \    Exit For Loop If    "${len}" >= "${number}"
+    Set Focus To Element    @{element}[${index}]
+    [Return]    @{element}
+
+js判断元素个数大于等于索引值
+    [Arguments]    ${css}    ${index}
+    ${number}    evaluate    ${index}+1
+    :FOR    ${i}    IN RANGE    1000
+    \    wait until page contains element    css:${css[1:-1]}    30    page not contains element
+    \    @{el}    Get WebElements    css:${css[1:-1]}
+    \    ${len}    得到长度    ${el}
+    \    Exit For Loop If    "${len}" >= "${number}"
+    Set Focus To Element    @{el}[${index}]
+
 退出驱动
     [Documentation]    退出驱动，自动判断是Window还是Linux环境
     ...    关闭：谷歌、IE、火狐的驱动，防止驱动未关出现问题
@@ -94,95 +114,106 @@ Linux_Kill
 
 鼠标悬停
     [Arguments]    ${locator}    ${index}=0
-    @{el}    得到所有元素    ${locator}
-    Comment    Set Focus To Element    @{el}[${index}]
-    Mouse Over    @{el}[${index}]
+    @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    :FOR    ${i}    IN RANGE    7000
+    \    ${msg}    Run Keyword And Ignore Error    Mouse Over    @{el}[${index}]
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    Mouse Over    @{el}[${index}]
 
 点击元素
     [Arguments]    ${locator}    ${index}=0
     [Documentation]    点击元素。
     ...    参数${locator}：是定位 方式 例如：id=kw
     ...    ${index}是元素索引：当定位是一组元素时候使用
-    @{el}    得到所有元素    ${locator}
-    Comment    Set Focus To Element    @{el}[${index}]
-    : FOR    ${i}    IN RANGE    7000
+    @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    :FOR    ${i}    IN RANGE    7000
     \    ${msg}    Run Keyword And Ignore Error    click element    @{el}[${index}]
     \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    click element    @{el}[${index}]
 
 点击按钮
     [Arguments]    ${locator}    ${index}=0
     [Documentation]    参数${locator}：是定位 方式 例如：id=kw
     ...    ${index}是元素索引：当定位是一组元素时候使用，
-    @{el}    得到所有元素    ${locator}
-    Comment    Set Focus To Element    @{el}[${index}]
-    : FOR    ${i}    IN RANGE    7000
+    @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    :FOR    ${i}    IN RANGE    7000
     \    ${msg}    Run Keyword And Ignore Error    Click Button    @{el}[${index}]
     \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    Click Button    @{el}[${index}]
 
 点击链接
     [Arguments]    ${locator}    ${index}=0
     [Documentation]    参数${locator}：是定位 方式 例如：id=kw
     ...    ${index}是元素索引：当定位是一组元素时候使用，
-    @{el}    得到所有元素    ${locator}
-    Comment    Set Focus To Element    @{el}[${index}]
-    : FOR    ${i}    IN RANGE    7000
+    @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    :FOR    ${i}    IN RANGE    7000
     \    ${msg}    Run Keyword And Ignore Error    Click Link    @{el}[${index}]
     \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    Click Link    @{el}[${index}]
 
 双击
     [Arguments]    ${locator}    ${index}=0
     [Documentation]    参数${locator}：是定位 方式 例如：id=kw
     ...    ${index}是元素索引：当定位是一组元素时候使用，
-    @{el}    得到所有元素    ${locator}
-    Comment    Set Focus To Element    @{el}[${index}]
-    : FOR    ${i}    IN RANGE    7000
+    @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    :FOR    ${i}    IN RANGE    7000
     \    ${msg}    Run Keyword And Ignore Error    double click element    @{el}[${index}]
     \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    double click element    @{el}[${index}]
 
 输入文本
     [Arguments]    ${locator}    ${text}    ${index}=0
     [Documentation]    参数${locator}：是定位 方式，例如：id=kw；
     ...    ${text}是输入的文本；
     ...    ${index}是元素索引：当定位是一组元素时候使用
-    @{el}    得到所有元素    ${locator}
-    Comment    Set Focus To Element    @{el}[${index}]
-    clear element text    @{el}[${index}]
-    : FOR    ${i}    IN RANGE    7000
+    @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    :FOR    ${i}    IN RANGE    7000
     \    ${msg}    Run Keyword And Ignore Error    input text    @{el}[${index}]    ${text}
     \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    input text    @{el}[${index}]    ${text}
 
 点击radio
     [Arguments]    ${css}    ${index}=0
     [Documentation]    js定位是使用css语法；
     ...    参数${css}:是定位；例如：'#kw',必须使用 引号括起来；
     ...    参数${index}：是索引，当得到一组元素时候使用；
-    wait until page contains element    css:${css[1:-1]}    30    page not contains element
-    Comment    Set Focus To Element    css:${css[1:-1]}
+    js判断元素个数大于等于索引值    ${css}    ${index}
     ${time}    evaluate    time.strftime('%m%d%H%M%S')    time
     Execute Javascript    document.querySelectorAll(${css})[${index}].setAttribute('name','radio_${time}')    #新增name的属性，如果有的话进行修改成新的
     Execute Javascript    document.querySelectorAll(${css})[${index}].setAttribute('value','radio_${time}')    #新增value的属性，如果有的话进行修改成新的
     : FOR    ${i}    IN RANGE    7000
     \    ${msg}    Run Keyword And Ignore Error    select radio button    radio_${time}    radio_${time}
     \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    select radio button    radio_${time}    radio_${time}
 
 点击checkbox
     [Arguments]    ${locator}    ${index}=0
     [Documentation]    点击复选框；参数${locator}：是定位 方式 例如：id=kw
     ...    ${index}是元素索引：当定位是一组元素时候使用
-    @{el}    得到所有元素    ${locator}
+    @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
     : FOR    ${i}    IN RANGE    7000
     \    ${msg}    Run Keyword And Ignore Error    select checkbox    @{el}[${index}]
     \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    select checkbox    @{el}[${index}]
 
 取消checkbox
     [Arguments]    ${locator}    ${index}=0
     [Documentation]    取消选择复选框；参数${locator}：是定位 方式 例如：id=kw
     ...    ${index}是元素索引：当定位是一组元素时候使用
-    @{el}    得到所有元素    ${locator}
-    Comment    Set Focus To Element    @{el}[${index}]
-    : FOR    ${i}    IN RANGE    7000
+    @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    :FOR    ${i}    IN RANGE    7000
     \    ${msg}    Run Keyword And Ignore Error    unselect checkbox    @{el}[${index}]
     \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    unselect checkbox    @{el}[${index}]
 
 下拉框
     [Arguments]    ${locator}    ${value}    ${index}=0
@@ -190,41 +221,61 @@ Linux_Kill
     ...    参数${locator}：是定位 方式；
     ...    参数${value}：是标签option中value的值；
     ...    ${index}是元素索引：当定位是一组元素时候使用；
-    @{el}    得到所有元素    ${locator}
-    Comment    Set Focus To Element    @{el}[${index}]
-    select from list by value    @{el}[${index}]    ${value}
+    @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    :FOR    ${i}    IN RANGE    7000
+    \    ${msg}    Run Keyword And Ignore Error    select from list by value    @{el}[${index}]    ${value}
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    select from list by value    @{el}[${index}]    ${value}
 
 下拉框index
-    [Arguments]    ${locator}    ${index}    ${number}=0
+    [Arguments]    ${locator}    ${index_01}    ${index}=0
     [Documentation]    使用索引值选择列表下拉框；
     ...    参数${locator}：是定位 方式；
-    ...    参数${index}：是标签中的索引的值；
-    ...    ${number}是元素索引：当定位是一组元素时候使用；
-    @{el}    得到所有元素    ${locator}
-    Comment    Set Focus To Element    @{el}[${number}]
-    select from list by index    @{el}[${number}]    ${index}
+    ...    参数${index_01}：是标签中的索引的值；
+    ...    ${index}是元素索引：当定位是一组元素时候使用；
+    @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    :FOR    ${i}    IN RANGE    7000
+    \    ${msg}    Run Keyword And Ignore Error    select from list by index    @{el}[${index}]    ${index_01}
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    select from list by index    @{el}[${index}]    ${index_01}
+
+得到文本
+    [Arguments]    ${locator}    ${index}=0
+    [Documentation]    得到页面元素的文本；
+    ...    参数${locater}是元素的定位
+    @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    : FOR    ${i}    IN RANGE    7000
+    \    ${text}    get text    @{el}[${index}]
+    \    ${len}    得到长度    ${text}
+    \    Exit For Loop If    "${len}" > "0"
+    ${text}    get text    @{el}[${index}]
+    [Return]    ${text}
 
 jq点击
     [Arguments]    ${css}    ${index}=0
     [Documentation]    jq定位是使用css语法；
     ...    参数${css}:是定位；例如：'#kw',必须使用 引号括起来；
     ...    参数${index}：是索引，当得到一组元素时候使用；
-    wait until page contains element    css:${css[1:-1]}    30    page not contains element
-    Set Focus To Element    css:${css[1:-1]}
+    js判断元素个数大于等于索引值    ${css}    ${index}
     : FOR    ${i}    IN RANGE    7000
-    \    ${status}    Run Keyword And Ignore Error    execute javascript    $(${css}).eq(${index}).click()
-    \    Exit For Loop If    "${status[0]}" == "PASS"
+    \    ${msg}    Run Keyword And Ignore Error    execute javascript    $(${css}).eq(${index}).click()
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    $(${css}).eq(${index}).click()
 
 jq双击
     [Arguments]    ${css}    ${index}=0
     [Documentation]    jq定位是使用css语法；
     ...    参数${css}:是定位；例如：'#kw',必须使用 引号括起来；
     ...    参数${index}：是索引，当得到一组元素时候使用；
-    wait until page contains element    css:${css[1:-1]}    30    page not contains element
-    Set Focus To Element    css:${css[1:-1]}
-    : FOR    ${i}    IN RANGE    7000
-    \    ${status}    Run Keyword And Ignore Error    execute javascript    $(${css}).eq(${index}).dblclick()
-    \    Exit For Loop If    "${status[0]}" == "PASS"
+    js判断元素个数大于等于索引值    ${css}    ${index}
+    :FOR    ${i}    IN RANGE    7000
+    \    ${msg}    Run Keyword And Ignore Error    execute javascript    $(${css}).eq(${index}).dblclick()
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    $(${css}).eq(${index}).dblclick()
 
 jq输入
     [Arguments]    ${css}    ${text}    ${index}=0
@@ -232,20 +283,20 @@ jq输入
     ...    参数${css}:是定位；例如：'#kw',必须使用 引号括起来；
     ...    参数${text}：是要输入的文本
     ...    参数${index}：是索引，当得到一组元素时候使用；
-    wait until page contains element    css:${css[1:-1]}    30    page not contains element
-    Set Focus To Element    css:${css[1:-1]}
-    : FOR    ${i}    IN RANGE    7000
-    \    ${status}    Run Keyword And Ignore Error    execute javascript    $(${css}).eq(${index}).val('${text}')
-    \    Exit For Loop If    "${status[0]}" == "PASS"
+    js判断元素个数大于等于索引值    ${css}    ${index}
+    :FOR    ${i}    IN RANGE    7000
+    \    ${msg}    Run Keyword And Ignore Error    execute javascript    $(${css}).eq(${index}).val('${text}')
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    $(${css}).eq(${index}).val('${text}')
 
 jq得到文本
     [Arguments]    ${css}    ${index}=0
     [Documentation]    jq定位是使用css语法；
     ...    参数${css}:是定位；例如：'#kw',必须使用 引号括起来；
     ...    参数${index}：是索引，当得到一组元素时候使用；
-    wait until page contains element    css:${css[1:-1]}    30    page not contains element
-    Set Focus To Element    css:${css[1:-1]}
-    : FOR    ${i}    IN RANGE    7000
+    js判断元素个数大于等于索引值    ${css}    ${index}
+    :FOR    ${i}    IN RANGE    7000
     \    ${length}    execute javascript    return $(${css}).eq(${index}).text().length
     \    Exit For Loop If    "${length}" > "0"
     ${text}    execute javascript    return $(${css}).eq(${index}).text()
@@ -256,11 +307,12 @@ js点击
     [Documentation]    js定位是使用css语法；
     ...    参数${css}:是定位；例如：'#kw',必须使用 引号括起来；
     ...    参数${index}：是索引，当得到一组元素时候使用；
-    wait until page contains element    css:${css[1:-1]}    30    page not contains element
-    Set Focus To Element    css:${css[1:-1]}
-    : FOR    ${i}    IN RANGE    7000
-    \    ${status}    Run Keyword And Ignore Error    execute javascript    document.querySelectorAll(${css})[${index}].click()
-    \    Exit For Loop If    "${status[0]}" == "PASS"
+    js判断元素个数大于等于索引值    ${css}    ${index}
+    :FOR    ${i}    IN RANGE    7000
+    \    ${msg}    Run Keyword And Ignore Error    execute javascript    document.querySelectorAll(${css})[${index}].click()
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    document.querySelectorAll(${css})[${index}].click()
 
 js输入
     [Arguments]    ${css}    ${text}    ${index}=0
@@ -268,20 +320,20 @@ js输入
     ...    参数${css}:是定位；例如：'#kw',必须使用 引号括起来；
     ...    参数${text}：是输入的文本；
     ...    参数${index}：是索引，当得到一组元素时候使用；
-    wait until page contains element    css:${css[1:-1]}    30    page not contains element
-    Set Focus To Element    css:${css[1:-1]}
-    : FOR    ${i}    IN RANGE    7000
-    \    ${status}    Run Keyword And Ignore Error    execute javascript    document.querySelectorAll(${css})[${index}].value='${text}'
-    \    Exit For Loop If    "${status[0]}" == "PASS"
+    js判断元素个数大于等于索引值    ${css}    ${index}
+    :FOR    ${i}    IN RANGE    7000
+    \    ${msg}    Run Keyword And Ignore Error    execute javascript    document.querySelectorAll(${css})[${index}].value='${text}'
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    document.querySelectorAll(${css})[${index}].value='${text}'
 
 js得到文本
     [Arguments]    ${css}    ${index}=0
     [Documentation]    js定位是使用css语法；
     ...    参数${css}:是定位；例如：'#kw',必须使用 引号括起来；
     ...    参数${index}：是索引，当得到一组元素时候使用；
-    wait until page contains element    css:${css[1:-1]}    30    page not contains element
-    Set Focus To Element    css:${css[1:-1]}
-    : FOR    ${i}    IN RANGE    7000
+    js判断元素个数大于等于索引值    ${css}    ${index}
+    :FOR    ${i}    IN RANGE    7000
     \    ${length}    execute javascript    return document.querySelectorAll(${css})[${index}].innerText.length
     \    Exit For Loop If    "${length}" > "0"
     ${text}    execute javascript    return document.querySelectorAll(${css})[${index}].innerText
@@ -293,9 +345,12 @@ div滚动条
     ...    参数${css}:是定位；例如：'#kw',必须使用 引号括起来；
     ...    参数${number}：是滚动的位置 ，输入的值，例如：1000；
     ...    参数${index}：是索引，当得到一组元素时候使用；
-    wait until page contains element    css:${css[1:-1]}    30    page not contains element
-    Set Focus To Element    css:${css[1:-1]}
-    execute javascript    document.querySelectorAll(${css})[${index}].scrollTop=${number}
+    js判断元素个数大于等于索引值    ${css}    ${index}
+    :FOR    ${i}    IN RANGE    7000
+    \    ${msg}    Run Keyword And Ignore Error    execute javascript    document.querySelectorAll(${css})[${index}].scrollTop=${number}
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    document.querySelectorAll(${css})[${index}].scrollTop=${number}
 
 div滚动条left
     [Arguments]    ${css}    ${number}    ${index}=0
@@ -303,9 +358,12 @@ div滚动条left
     ...    参数${css}:是定位；例如：'#kw',必须使用 引号括起来；
     ...    参数${number}：是滚动的位置 ，输入的值，例如：1000；
     ...    参数${index}：是索引，当得到一组元素时候使用；
-    wait until page contains element    css:${css[1:-1]}    30    page not contains element
-    Set Focus To Element    css:${css[1:-1]}
-    execute javascript    document.querySelectorAll(${css})[${index}].scrollLeft=${number}
+    js判断元素个数大于等于索引值    ${css}    ${index}
+    :FOR    ${i}    IN RANGE    7000
+    \    ${msg}    Run Keyword And Ignore Error    execute javascript    document.querySelectorAll(${css})[${index}].scrollLeft=${number}
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    document.querySelectorAll(${css})[${index}].scrollLeft=${number}
 
 滚动条
     [Arguments]    ${number}
@@ -324,11 +382,12 @@ div滚动条left
     [Documentation]    切换到frame框，参数${locator}：是定位方式；
     ...    如果有id和name的话直接写： 两个属性的值即可；
     ...    例如id=kw，name=su，直接写 kw或su即可
-    @{el}    得到所有元素    ${locator}
-    Comment    Set Focus To Element    @{el}[${index}]
-    : FOR    ${i}    IN RANGE    7000
+    @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    :FOR    ${i}    IN RANGE    7000
     \    ${msg}    Run Keyword And Ignore Error    select frame    @{el}[${index}]
     \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    select frame    @{el}[${index}]
 
 返回frame
     [Documentation]    返回主frame
@@ -416,19 +475,6 @@ div滚动条left
     [Documentation]    参数${text}：是等待页面包含的文本
     Wait Until Page Contains    ${text}
     log    ${text}    #如果页面有预期的文本打印出实际结果
-
-得到文本
-    [Arguments]    ${locator}    ${index}=0
-    [Documentation]    得到页面元素的文本；
-    ...    参数${locater}是元素的定位
-    @{el}    得到所有元素    ${locator}
-    Set Focus To Element    @{el}[${index}]
-    : FOR    ${i}    IN RANGE    7000
-    \    ${text}    get text    @{el}[${index}]
-    \    ${len}    得到长度    ${text}
-    \    Exit For Loop If    "${len}" > "0"
-    ${text}    get text    @{el}[${index}]
-    [Return]    ${text}
 
 得到长度
     [Arguments]    ${x}
