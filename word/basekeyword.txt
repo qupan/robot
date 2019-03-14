@@ -36,7 +36,7 @@ Resource          message.txt
     :FOR    ${i}    IN RANGE    1000
     \    @{element}    得到所有元素    ${locator}
     \    ${len}    得到长度    ${element}
-    \    Exit For Loop If    "${len}" >= "${number}"
+    \    Exit For Loop If    ${len} >= ${number}
     Set Focus To Element    @{element}[${index}]
     [Return]    @{element}
 
@@ -47,7 +47,7 @@ js判断元素个数大于等于索引值
     \    wait until page contains element    css:${css[1:-1]}    30    page not contains element
     \    @{el}    Get WebElements    css:${css[1:-1]}
     \    ${len}    得到长度    ${el}
-    \    Exit For Loop If    "${len}" >= "${number}"
+    \    Exit For Loop If    ${len} >= ${number}
     Set Focus To Element    @{el}[${index}]
 
 退出驱动
