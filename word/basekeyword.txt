@@ -280,6 +280,22 @@ jq点击
     RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
     ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    $('${css}').eq(${index}).click()
 
+jq点击文本
+    [Arguments]    ${label}    ${text}    ${index}=0
+    [Documentation]    使用标签之间的文本来点击元素
+    ...    ${label}：是元素便签的名字，例如：a，span，div等
+    ...    ${text} ：是元素标签之间的文本
+    ...    ${index}：如果得到的是多个元素，输入所需元素的索引
+    ${locater}    evaluate    'xpath://{}[contains(text(),"${text}")]'.format("${label}")
+    @{el}    原生判断元素个数大于等于索引值    ${locater}    ${index}
+    ${name}    evaluate    time.strftime('%H%M%S')    time
+    Assign Id To Element    @{el}[${index}]    id_${name}
+    :FOR    ${i}    IN RANGE    50
+    \    ${msg}    Run Keyword And Ignore Error    execute javascript    $('#id_${name}').click()
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    $('#id_${name}').click()
+
 jq双击
     [Arguments]    ${locater}    ${index}=0
     [Documentation]    jq定位是使用jquery定位
@@ -332,6 +348,22 @@ js点击
     \    Exit For Loop If    "${msg[0]}" == "PASS"
     RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
     ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    document.querySelectorAll('${css}')[${index}].click()
+
+js点击文本
+    [Arguments]    ${label}    ${text}    ${index}=0
+    [Documentation]    使用标签之间的文本来点击元素
+    ...    ${label}：是元素便签的名字，例如：a，span，div等
+    ...    ${text} ：是元素标签之间的文本
+    ...    ${index}：如果得到的是多个元素，输入所需元素的索引
+    ${locater}    evaluate    'xpath://{}[contains(text(),"${text}")]'.format("${label}")
+    @{el}    原生判断元素个数大于等于索引值    ${locater}    ${index}
+    ${name}    evaluate    time.strftime('%H%M%S')    time
+    Assign Id To Element    @{el}[${index}]    id_${name}
+    :FOR    ${i}    IN RANGE    50
+    \    ${msg}    Run Keyword And Ignore Error    execute javascript    document.querySelector('#id_${name}').click()
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    document.querySelector('#id_${name}').click()
 
 js输入
     [Arguments]    ${locater}    ${text}    ${index}=0
@@ -618,3 +650,13 @@ json转换
     ${x}    evaluate    ${dict}
     ${json}    evaluate    json.dumps(${x},indent=4,ensure_ascii=False)    json
     [Return]    ${json}
+
+demo
+    [Arguments]    ${label}    ${text}    ${index}=0
+    ${locater}    evaluate    'xpath://{}[contains(text(),"${text}")]'.format("${label}")
+    :FOR    ${i}    IN RANGE    50
+    \    @{el}    得到所有元素    ${locater}
+    \    ${msg}    Run Keyword And Ignore Error    click element    @{el}[${index}]
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    click element    @{el}[${index}]
