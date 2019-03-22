@@ -139,8 +139,8 @@ Linux_Kill
     ...    ${label}：是元素便签的名字，例如：a，span，div等
     ...    ${text} ：是元素标签之间的文本
     ...    ${index}：如果得到的是多个元素，输入所需元素的索引
-    ${locater}    evaluate    'xpath://{}[contains(text(),"${text}")]'.format("${label}")
-    @{el}    原生判断元素个数大于等于索引值    ${locater}    ${index}
+    ${locator}    evaluate    'xpath://{}[contains(text(),"${text}")]'.format("${label}")
+    @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
     : FOR    ${i}    IN RANGE    50
     \    ${msg}    Run Keyword And Ignore Error    click element    @{el}[${index}]
     \    Exit For Loop If    "${msg[0]}" == "PASS"
@@ -255,10 +255,34 @@ Linux_Kill
     RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
     ...    ELSE IF    "${msg[0]}" == "FAIL"    select from list by index    @{el}[${index}]    ${index_01}
 
+非标准下拉框
+    [Arguments]    ${locator}    ${text}    ${index}=0
+    [Documentation]    使用标签值选择列表下拉框；
+    ...    参数${locator}：是定位 方式；
+    ...    参数${text}：是标签li中的文本值；
+    ...    ${index}是元素索引：当li中的文本不唯一时候使用索引值；
+    @{el}    得到所有元素    ${locator}
+    ${name}    evaluate    str(time.time()).replace('.','')    time
+    Assign Id To Element    @{el}[0]    id_01_${name}    #给下拉框标签添加id
+    : FOR    ${i}    IN RANGE    50
+    \    ${msg}    Run Keyword And Ignore Error    execute javascript    document.querySelector('#id_01_${name}').click()
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    document.querySelector('#id_01_${name}').click()
+    ${label}    BuiltIn.Set Variable    li
+    ${locator}    evaluate    'xpath://{}[contains(text(),"${text}")]'.format("${label}")
+    @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    Assign Id To Element    @{el}[${index}]    id_02_${name}    #给li标签添加id
+    : FOR    ${i}    IN RANGE    50
+    \    ${msg}    Run Keyword And Ignore Error    execute javascript    document.querySelector('#id_02_${name}').click()
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    document.querySelector('#id_02_${name}').click()
+
 得到文本
     [Arguments]    ${locator}    ${index}=0
     [Documentation]    得到页面元素的文本；
-    ...    参数${locater}是元素的定位
+    ...    参数${locator}是元素的定位
     @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
     : FOR    ${i}    IN RANGE    50
     \    ${text}    get text    @{el}[${index}]
@@ -268,12 +292,12 @@ Linux_Kill
     [Return]    ${text}
 
 jq点击
-    [Arguments]    ${locater}    ${index}=0
+    [Arguments]    ${locator}    ${index}=0
     [Documentation]    jq定位是使用jquery定位
-    ...    参数${locater}:是定位；
+    ...    参数${locator}:是定位；
     ...    参数${index}：是索引，当得到一组元素时候使用；
-    原生判断元素个数大于等于索引值    ${locater}    ${index}
-    ${css}    set variable    ${locater[7:]}
+    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    ${css}    set variable    ${locator[7:]}
     : FOR    ${i}    IN RANGE    50
     \    ${msg}    Run Keyword And Ignore Error    execute javascript    $('${css}').eq(${index}).click()
     \    Exit For Loop If    "${msg[0]}" == "PASS"
@@ -286,23 +310,23 @@ jq点击文本
     ...    ${label}：是元素便签的名字，例如：a，span，div等
     ...    ${text} ：是元素标签之间的文本
     ...    ${index}：如果得到的是多个元素，输入所需元素的索引
-    ${locater}    evaluate    'xpath://{}[contains(text(),"${text}")]'.format("${label}")
-    @{el}    原生判断元素个数大于等于索引值    ${locater}    ${index}
-    ${name}    evaluate    time.strftime('%H%M%S')    time
+    ${locator}    evaluate    'xpath://{}[contains(text(),"${text}")]'.format("${label}")
+    @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    ${name}    evaluate    str(time.time()).replace('.','')    time
     Assign Id To Element    @{el}[${index}]    id_${name}
-    :FOR    ${i}    IN RANGE    50
+    : FOR    ${i}    IN RANGE    50
     \    ${msg}    Run Keyword And Ignore Error    execute javascript    $('#id_${name}').click()
     \    Exit For Loop If    "${msg[0]}" == "PASS"
     RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
     ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    $('#id_${name}').click()
 
 jq双击
-    [Arguments]    ${locater}    ${index}=0
+    [Arguments]    ${locator}    ${index}=0
     [Documentation]    jq定位是使用jquery定位
-    ...    参数${locater}:是定位；
+    ...    参数${locator}:是定位；
     ...    参数${index}：是索引，当得到一组元素时候使用；
-    原生判断元素个数大于等于索引值    ${locater}    ${index}
-    ${css}    set variable    ${locater[7:]}
+    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    ${css}    set variable    ${locator[7:]}
     : FOR    ${i}    IN RANGE    50
     \    ${msg}    Run Keyword And Ignore Error    execute javascript    $('${css}').eq(${index}).dblclick()
     \    Exit For Loop If    "${msg[0]}" == "PASS"
@@ -310,13 +334,13 @@ jq双击
     ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    $('${css}').eq(${index}).dblclick()
 
 jq输入
-    [Arguments]    ${locater}    ${text}    ${index}=0
+    [Arguments]    ${locator}    ${text}    ${index}=0
     [Documentation]    jq定位是使用jquery定位
-    ...    参数${locater}:是定位；
+    ...    参数${locator}:是定位；
     ...    参数${index}：是索引，当得到一组元素时候使用；
     ...    参数${text}：是要输入的文本
-    原生判断元素个数大于等于索引值    ${locater}    ${index}
-    ${css}    set variable    ${locater[7:]}
+    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    ${css}    set variable    ${locator[7:]}
     : FOR    ${i}    IN RANGE    50
     \    ${msg}    Run Keyword And Ignore Error    execute javascript    $('${css}').eq(${index}).val('${text}')
     \    Exit For Loop If    "${msg[0]}" == "PASS"
@@ -324,12 +348,12 @@ jq输入
     ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    $('${css}').eq(${index}).val('${text}')
 
 jq得到文本
-    [Arguments]    ${locater}    ${index}=0
+    [Arguments]    ${locator}    ${index}=0
     [Documentation]    jq定位是使用jquery定位
-    ...    参数${locater}:是定位；
+    ...    参数${locator}:是定位；
     ...    参数${index}：是索引，当得到一组元素时候使用；
-    原生判断元素个数大于等于索引值    ${locater}    ${index}
-    ${css}    set variable    ${locater[7:]}
+    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    ${css}    set variable    ${locator[7:]}
     : FOR    ${i}    IN RANGE    50
     \    ${length}    execute javascript    return $('${css}').eq(${index}).text().length
     \    Exit For Loop If    "${length}" > "0"
@@ -337,12 +361,12 @@ jq得到文本
     [Return]    ${text}
 
 js点击
-    [Arguments]    ${locater}    ${index}=0
+    [Arguments]    ${locator}    ${index}=0
     [Documentation]    js定位只能使用css语法；
-    ...    参数${locater}:是定位；
+    ...    参数${locator}:是定位；
     ...    参数${index}：是索引，当得到一组元素时候使用；
-    原生判断元素个数大于等于索引值    ${locater}    ${index}
-    ${css}    set variable    ${locater[4:]}
+    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    ${css}    set variable    ${locator[4:]}
     : FOR    ${i}    IN RANGE    50
     \    ${msg}    Run Keyword And Ignore Error    execute javascript    document.querySelectorAll('${css}')[${index}].click()
     \    Exit For Loop If    "${msg[0]}" == "PASS"
@@ -355,24 +379,24 @@ js点击文本
     ...    ${label}：是元素便签的名字，例如：a，span，div等
     ...    ${text} ：是元素标签之间的文本
     ...    ${index}：如果得到的是多个元素，输入所需元素的索引
-    ${locater}    evaluate    'xpath://{}[contains(text(),"${text}")]'.format("${label}")
-    @{el}    原生判断元素个数大于等于索引值    ${locater}    ${index}
-    ${name}    evaluate    time.strftime('%H%M%S')    time
+    ${locator}    evaluate    'xpath://{}[contains(text(),"${text}")]'.format("${label}")
+    @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    ${name}    evaluate    str(time.time()).replace('.','')    time
     Assign Id To Element    @{el}[${index}]    id_${name}
-    :FOR    ${i}    IN RANGE    50
+    : FOR    ${i}    IN RANGE    50
     \    ${msg}    Run Keyword And Ignore Error    execute javascript    document.querySelector('#id_${name}').click()
     \    Exit For Loop If    "${msg[0]}" == "PASS"
     RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
     ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    document.querySelector('#id_${name}').click()
 
 js输入
-    [Arguments]    ${locater}    ${text}    ${index}=0
+    [Arguments]    ${locator}    ${text}    ${index}=0
     [Documentation]    js定位只能使用css语法；
-    ...    参数${locater}:是定位；
+    ...    参数${locator}:是定位；
     ...    参数${index}：是索引，当得到一组元素时候使用；
     ...    参数${text}：是输入的文本；
-    原生判断元素个数大于等于索引值    ${locater}    ${index}
-    ${css}    set variable    ${locater[4:]}
+    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    ${css}    set variable    ${locator[4:]}
     : FOR    ${i}    IN RANGE    50
     \    ${msg}    Run Keyword And Ignore Error    execute javascript    document.querySelectorAll('${css}')[${index}].value='${text}'
     \    Exit For Loop If    "${msg[0]}" == "PASS"
@@ -380,12 +404,12 @@ js输入
     ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    document.querySelectorAll('${css}')[${index}].value='${text}'
 
 js得到文本
-    [Arguments]    ${locater}    ${index}=0
+    [Arguments]    ${locator}    ${index}=0
     [Documentation]    js定位只能使用css语法；
-    ...    参数${locater}:是定位；
+    ...    参数${locator}:是定位；
     ...    参数${index}：是索引，当得到一组元素时候使用；
-    原生判断元素个数大于等于索引值    ${locater}    ${index}
-    ${css}    set variable    ${locater[4:]}
+    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    ${css}    set variable    ${locator[4:]}
     : FOR    ${i}    IN RANGE    50
     \    ${length}    execute javascript    return document.querySelectorAll('${css}')[${index}].innerText.length
     \    Exit For Loop If    "${length}" > "0"
@@ -393,14 +417,14 @@ js得到文本
     [Return]    ${text}
 
 div滚动条
-    [Arguments]    ${locater}    ${number}    ${index}=0
+    [Arguments]    ${locator}    ${number}    ${index}=0
     [Documentation]    默认上下移动div内嵌式hi滚动条；
     ...    js定位是使用css定位
-    ...    参数${locater}:是定位；
+    ...    参数${locator}:是定位；
     ...    参数${index}：是索引，当得到一组元素时候使用；
     ...    参数${number}：是滚动的位置 ，输入的值，例如：50；
-    原生判断元素个数大于等于索引值    ${locater}    ${index}
-    ${css}    set variable    ${locater[4:]}
+    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    ${css}    set variable    ${locator[4:]}
     : FOR    ${i}    IN RANGE    50
     \    ${msg}    Run Keyword And Ignore Error    execute javascript    document.querySelectorAll('${css}')[${index}].scrollTop=${number}
     \    Exit For Loop If    "${msg[0]}" == "PASS"
@@ -408,14 +432,14 @@ div滚动条
     ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    document.querySelectorAll('${css}')[${index}].scrollTop=${number}
 
 div滚动条left
-    [Arguments]    ${locater}    ${number}    ${index}=0
+    [Arguments]    ${locator}    ${number}    ${index}=0
     [Documentation]    默认左右移动div内嵌式hi滚动条；
     ...    js定位是使用css定位
-    ...    参数${locater}:是定位；
+    ...    参数${locator}:是定位；
     ...    参数${number}：是滚动的位置 ，输入的值，例如：50；
     ...    参数${index}：是索引，当得到一组元素时候使用；
-    原生判断元素个数大于等于索引值    ${locater}    ${index}
-    ${css}    set variable    ${locater[4:]}
+    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    ${css}    set variable    ${locator[4:]}
     : FOR    ${i}    IN RANGE    50
     \    ${msg}    Run Keyword And Ignore Error    execute javascript    document.querySelectorAll('${css}')[${index}].scrollLeft=${number}
     \    Exit For Loop If    "${msg[0]}" == "PASS"
@@ -650,13 +674,3 @@ json转换
     ${x}    evaluate    ${dict}
     ${json}    evaluate    json.dumps(${x},indent=4,ensure_ascii=False)    json
     [Return]    ${json}
-
-demo
-    [Arguments]    ${label}    ${text}    ${index}=0
-    ${locater}    evaluate    'xpath://{}[contains(text(),"${text}")]'.format("${label}")
-    :FOR    ${i}    IN RANGE    50
-    \    @{el}    得到所有元素    ${locater}
-    \    ${msg}    Run Keyword And Ignore Error    click element    @{el}[${index}]
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    click element    @{el}[${index}]
