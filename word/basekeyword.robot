@@ -192,6 +192,16 @@ Linux_Kill
     RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
     ...    ELSE IF    "${msg[0]}" == "FAIL"    input text    @{el}[${index}]    ${text}
 
+canvas输入文本
+    [Arguments]    ${locator}    ${text}    ${index}=0
+    [Documentation]    参数${locator}：是定位 方式，例如：id=kw；
+    ...    ${text}是输入的文本；
+    ...    ${index}是元素索引：当定位是一组元素时候使用
+    @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    ${name}    evaluate    str(time.time()).replace('.','')    time
+    Assign Id To Element    @{el}[0]    id_01_${name}    #给canvas标签添加id
+    Execute Javascript    el=document.querySelector('#id_01_${name}');context=el.getContext("2d");context.fillStyle='#000000';context.font = "bold 150px Arial";context.textAlign = "left";context.textBaseline = "middle";context.strokeText("${text}", 200, 200);
+
 点击radio
     [Arguments]    ${css}    ${index}=0
     [Documentation]    js定位是使用css语法；
@@ -261,7 +271,7 @@ Linux_Kill
     ...    参数${locator}：是定位 方式；
     ...    参数${text}：是标签li中的文本值；
     ...    ${index}是元素索引：当li中的文本不唯一时候使用索引值；
-    @{el}    得到所有元素    ${locator}
+    @{el}    得到所有元素    ${locator}    #因为第一个定位参数不能默认值，所以只能传入唯一定位
     ${name}    evaluate    str(time.time()).replace('.','')    time
     Assign Id To Element    @{el}[0]    id_01_${name}    #给下拉框标签添加id
     : FOR    ${i}    IN RANGE    50
