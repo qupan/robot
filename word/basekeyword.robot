@@ -193,14 +193,22 @@ Linux_Kill
     ...    ELSE IF    "${msg[0]}" == "FAIL"    input text    @{el}[${index}]    ${text}
 
 canvas输入文本
-    [Arguments]    ${locator}    ${text}    ${index}=0
+    [Arguments]    ${locator}    ${text}    @{size}
     [Documentation]    参数${locator}：是定位 方式，例如：id=kw；
     ...    ${text}是输入的文本；
-    ...    ${index}是元素索引：当定位是一组元素时候使用
+    ...    @{size}是一个列表：如果canvas是唯一定位，
+    ...    传入3个参数【150,10,100】，分别表示：输入字体大小
+    ...    、距离左边画板的距离，距离上边画板的距离，
+    ...    如果canvas不是唯一定位，传入4个参数【1，150,10,100】
+    ...    ，第一个参数为要操作元素的索引值，后3个和上面相同
+    ${x}    得到长度    ${size}
+    ${index}    BuiltIn.Run Keyword If    ${x} == 3    BuiltIn.Set Variable    0
+    ...    ELSE IF    ${x} == 4    BuiltIn.Set Variable    @{size}[0]
     @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
     ${name}    evaluate    str(time.time()).replace('.','')    time
-    Assign Id To Element    @{el}[0]    id_01_${name}    #给canvas标签添加id
-    Execute Javascript    el=document.querySelector('#id_01_${name}');context=el.getContext("2d");context.fillStyle='#000000';context.font = "bold 150px Arial";context.textAlign = "left";context.textBaseline = "middle";context.strokeText("${text}", 200, 200);
+    Assign Id To Element    @{el}[${index}]    id_01_${name}    #给canvas标签添加id
+    BuiltIn.Run Keyword If    ${x} == 3    Execute Javascript    el=document.querySelector('#id_01_${name}');context=el.getContext("2d");context.fillStyle='#000000';context.font = "bold @{size}[0]px Arial";context.textAlign = "left";context.textBaseline = "middle";context.strokeText("${text}", @{size}[1], @{size}[2]);
+    ...    ELSE IF    ${x} == 4    Execute Javascript    el=document.querySelector('#id_01_${name}');context=el.getContext("2d");context.fillStyle='#000000';context.font = "bold @{size}[1]px Arial";context.textAlign = "left";context.textBaseline = "middle";context.strokeText("${text}", @{size}[2], @{size}[3]);
 
 点击radio
     [Arguments]    ${css}    ${index}=0
