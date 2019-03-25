@@ -18,7 +18,7 @@ Resource          message.txt
 等待元素出现
     [Arguments]    ${locator}
     wait until page contains element    ${locator}    30    page not contains element
-    wait until element isets visible    ${locator}    30    element is not visible
+    Comment    Wait Until Element Is Visible    ${locator}    30    element is not visible
     #参数${locator}为定位方式
 
 得到所有元素
@@ -304,9 +304,10 @@ canvas输入文本
     @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
     : FOR    ${i}    IN RANGE    50
     \    ${text}    get text    @{el}[${index}]
-    \    ${len}    得到长度    ${text}
-    \    Exit For Loop If    "${len}" > "0"
-    ${text}    get text    @{el}[${index}]
+    \    ${msg}    Run Keyword And Ignore Error    BuiltIn.Should Not Be Empty    ${text}
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    BuiltIn.Should Not Be Empty    ${text}
     [Return]    ${text}
 
 jq点击
@@ -366,16 +367,21 @@ jq输入
     ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    $('${css}').eq(${index}).val('${text}')
 
 jq得到文本
-    [Arguments]    ${locator}    ${index}=0
-    [Documentation]    jq定位是使用jquery定位
-    ...    参数${locator}:是定位；
-    ...    参数${index}：是索引，当得到一组元素时候使用；
-    原生判断元素个数大于等于索引值    ${locator}    ${index}
-    ${css}    set variable    ${locator[7:]}
-    : FOR    ${i}    IN RANGE    50
-    \    ${length}    execute javascript    return $('${css}').eq(${index}).text().length
-    \    Exit For Loop If    "${length}" > "0"
-    ${text}    execute javascript    return $('${css}').eq(${index}).text()
+    [Arguments]    ${label}    ${text}    ${index}=0
+    [Documentation]    使用标签之间的文本来得到文本
+    ...    ${label}：是元素便签的名字，例如：a，span，div等
+    ...    ${text} ：是元素标签之间的文本
+    ...    ${index}：如果得到的是多个元素，输入所需元素的索引
+    ${locator}    evaluate    'xpath://{}[contains(text(),"${text}")]'.format("${label}")
+    @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    ${name}    evaluate    str(time.time()).replace('.','')    time
+    Assign Id To Element    @{el}[${index}]    id_${name}
+    :FOR    ${i}    IN RANGE    50
+    \    ${text}    execute javascript    return $('#id_${name}').text()
+    \    ${msg}    Run Keyword And Ignore Error    BuiltIn.Should Not Be Empty    ${text}
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    BuiltIn.Should Not Be Empty    ${text}
     [Return]    ${text}
 
 js点击
@@ -406,6 +412,7 @@ js点击文本
     \    Exit For Loop If    "${msg[0]}" == "PASS"
     RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
     ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    document.querySelector('#id_${name}').click()
+    ${msg}    Run Keyword And Ignore Error    BuiltIn.Should Not Be Empty    ${x}
 
 js输入
     [Arguments]    ${locator}    ${text}    ${index}=0
@@ -422,16 +429,21 @@ js输入
     ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    document.querySelectorAll('${css}')[${index}].value='${text}'
 
 js得到文本
-    [Arguments]    ${locator}    ${index}=0
-    [Documentation]    js定位只能使用css语法；
-    ...    参数${locator}:是定位；
-    ...    参数${index}：是索引，当得到一组元素时候使用；
-    原生判断元素个数大于等于索引值    ${locator}    ${index}
-    ${css}    set variable    ${locator[4:]}
-    : FOR    ${i}    IN RANGE    50
-    \    ${length}    execute javascript    return document.querySelectorAll('${css}')[${index}].innerText.length
-    \    Exit For Loop If    "${length}" > "0"
-    ${text}    execute javascript    return document.querySelectorAll('${css}')[${index}].innerText.length
+    [Arguments]    ${label}    ${text}    ${index}=0
+    [Documentation]    使用标签之间的文本来得到所有文本
+    ...    ${label}：是元素便签的名字，例如：a，span，div等
+    ...    ${text} ：是元素标签之间的文本
+    ...    ${index}：如果得到的是多个元素，输入所需元素的索引
+    ${locator}    evaluate    'xpath://{}[contains(text(),"${text}")]'.format("${label}")
+    @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    ${name}    evaluate    str(time.time()).replace('.','')    time
+    Assign Id To Element    @{el}[${index}]    id_${name}
+    :FOR    ${i}    IN RANGE    50
+    \    ${text}    execute javascript    return document.querySelector('#id_${name}').innerText
+    \    ${msg}    Run Keyword And Ignore Error    BuiltIn.Should Not Be Empty    ${text}
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    BuiltIn.Should Not Be Empty    ${text}
     [Return]    ${text}
 
 div滚动条
