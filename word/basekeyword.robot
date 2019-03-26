@@ -376,7 +376,7 @@ jq得到文本
     @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
     ${name}    evaluate    str(time.time()).replace('.','')    time
     Assign Id To Element    @{el}[${index}]    id_${name}
-    :FOR    ${i}    IN RANGE    50
+    : FOR    ${i}    IN RANGE    50
     \    ${text}    execute javascript    return $('#id_${name}').text()
     \    ${msg}    Run Keyword And Ignore Error    BuiltIn.Should Not Be Empty    ${text}
     \    Exit For Loop If    "${msg[0]}" == "PASS"
@@ -438,7 +438,7 @@ js得到文本
     @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
     ${name}    evaluate    str(time.time()).replace('.','')    time
     Assign Id To Element    @{el}[${index}]    id_${name}
-    :FOR    ${i}    IN RANGE    50
+    : FOR    ${i}    IN RANGE    50
     \    ${text}    execute javascript    return document.querySelector('#id_${name}').innerText
     \    ${msg}    Run Keyword And Ignore Error    BuiltIn.Should Not Be Empty    ${text}
     \    Exit For Loop If    "${msg[0]}" == "PASS"
@@ -455,7 +455,7 @@ js上传文件
     @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
     ${css}    set variable    ${locator[4:]}
     execute javascript    document.querySelectorAll('${css}')[${index}].style="display: true"
-    :FOR    ${i}    IN RANGE    50
+    : FOR    ${i}    IN RANGE    50
     \    ${msg}    Run Keyword And Ignore Error    Choose File    @{el}[${index}]    ${file_path}
     \    Exit For Loop If    "${msg[0]}" == "PASS"
     RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
@@ -567,31 +567,14 @@ div滚动条left
 点击弹框
     confirm action    #点击弹框中的确定
 
-检查点
-    [Arguments]    ${locator}    ${text}    ${message}=not contains
-    [Documentation]    验证文本参数${locator} 为定位方式，得到元素的文本；
-    ...    参数${text}：是预期结果；
-    ...    参数${message}：是错误信息，默认是not contains
-    等待元素出现    ${locator}
-    Set Focus To Element    ${locator}
-    ${x}    得到文本    ${locator}
-    log    ${x.replace('\n',',')}    #打印实际结果
-    Should Not Be Empty    ${x}    get value is empty
-    should contain    ${text}    ${x.replace('\n',',')}    msg=${message}
-
-结果对比
+包含检查点
     [Arguments]    ${actual}    ${expect}
     [Documentation]    ${actual}是实际结果；
     ...    ${expect}是预期结果；
     log    ${actual.replace('\n',',')}    #打印实际结果
+    log    ${expect}    #打印预期结果
     Should Not Be Empty    ${actual}    get value is empty
-    should contain    ${expect}    ${actual}    msg=错误，预期结果和实际 结果不相同
-
-包含检查点
-    [Arguments]    ${text}
-    [Documentation]    参数${text}：是等待页面包含的文本
-    Wait Until Page Contains    ${text}
-    log    ${text}    #如果页面有预期的文本打印出实际结果
+    should contain    ${expect}    ${actual.replace('\n',',')}    msg=错误，预期结果和实际 结果不相同
 
 得到长度
     [Arguments]    ${x}
