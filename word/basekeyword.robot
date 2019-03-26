@@ -446,6 +446,21 @@ js得到文本
     ...    ELSE IF    "${msg[0]}" == "FAIL"    BuiltIn.Should Not Be Empty    ${text}
     [Return]    ${text}
 
+js上传文件
+    [Arguments]    ${locator}    ${file_path}    ${index}=0
+    [Documentation]    js上传文件定位只能使用css语法；
+    ...    参数${locator}:是定位；
+    ...    参数${file_path} ：是要上传文件的地址包括后缀名称
+    ...    参数${index}：是索引，当得到一组元素时候使用；
+    @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    ${css}    set variable    ${locator[4:]}
+    execute javascript    document.querySelectorAll('${css}')[${index}].style="display: true"
+    :FOR    ${i}    IN RANGE    50
+    \    ${msg}    Run Keyword And Ignore Error    Choose File    @{el}[${index}]    ${file_path}
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    Choose File    @{el}[${index}]    ${file_path}
+
 div滚动条
     [Arguments]    ${locator}    ${number}    ${index}=0
     [Documentation]    默认上下移动div内嵌式hi滚动条；
@@ -548,15 +563,6 @@ div滚动条left
 回车
     [Arguments]    ${locator}
     press key    ${locator}    \\13
-
-上传
-    [Arguments]    ${locator}    ${name}
-    Wait Until Page Contains Element    ${locator}
-    ${x}    Set Variable    ${CURDIR}
-    ${x1}    Set Variable    ${x.split('\word')[0]}
-    ${excel_address}    连接字符串    ${x1}    \\data\\${name}    #得到excel存放地址
-    Choose File    ${locator}    ${excel_address}
-    等待    1
 
 点击弹框
     confirm action    #点击弹框中的确定
