@@ -139,7 +139,7 @@ Linux_Kill
     ...    ${label}：是元素便签的名字，例如：a，span，div等
     ...    ${text} ：是元素标签之间的文本
     ...    ${index}：如果得到的是多个元素，输入所需元素的索引
-    ${locator}    evaluate    'xpath://{}[contains(text(),"${text}")]'.format("${label}")
+    ${locator}    evaluate    'xpath://{}[contains(string(),"${text}")]'.format("${label}")
     @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
     : FOR    ${i}    IN RANGE    50
     \    ${msg}    Run Keyword And Ignore Error    click element    @{el}[${index}]
@@ -310,6 +310,17 @@ canvas输入文本
     ...    ELSE IF    "${msg[0]}" == "FAIL"    BuiltIn.Should Not Be Empty    ${text}
     [Return]    ${text}
 
+得到表格数据
+    [Arguments]    ${locator}    ${row}    ${column}    ${index}=0
+    @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
+    : FOR    ${i}    IN RANGE    50
+    \    ${msg}    Run Keyword And Ignore Error    Get Table Cell    @{el}[${index}]    ${row}    ${column}
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    ${text}    RUN KEYWORD IF    "${msg[0]}" == "PASS"    Get Table Cell    @{el}[${index}]    ${row}    ${column}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    Get Table Cell    @{el}[${index}]    ${row}    ${column}
+    BuiltIn.Should Not Be Empty    ${text}
+    [Return]    ${text}
+
 jq点击
     [Arguments]    ${locator}    ${index}=0
     [Documentation]    jq定位是使用jquery定位
@@ -329,7 +340,7 @@ jq点击文本
     ...    ${label}：是元素便签的名字，例如：a，span，div等
     ...    ${text} ：是元素标签之间的文本
     ...    ${index}：如果得到的是多个元素，输入所需元素的索引
-    ${locator}    evaluate    'xpath://{}[contains(text(),"${text}")]'.format("${label}")
+    ${locator}    evaluate    'jquery:{}:contains("${text}")'.format("${label}")
     @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
     ${name}    evaluate    str(time.time()).replace('.','')    time
     Assign Id To Element    @{el}[${index}]    id_${name}
@@ -403,7 +414,7 @@ js点击文本
     ...    ${label}：是元素便签的名字，例如：a，span，div等
     ...    ${text} ：是元素标签之间的文本
     ...    ${index}：如果得到的是多个元素，输入所需元素的索引
-    ${locator}    evaluate    'xpath://{}[contains(text(),"${text}")]'.format("${label}")
+    ${locator}    evaluate    'xpath://{}[contains(string(),"${text}")]'.format("${label}")
     @{el}    原生判断元素个数大于等于索引值    ${locator}    ${index}
     ${name}    evaluate    str(time.time()).replace('.','')    time
     Assign Id To Element    @{el}[${index}]    id_${name}
@@ -412,7 +423,6 @@ js点击文本
     \    Exit For Loop If    "${msg[0]}" == "PASS"
     RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
     ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    document.querySelector('#id_${name}').click()
-    ${msg}    Run Keyword And Ignore Error    BuiltIn.Should Not Be Empty    ${x}
 
 js输入
     [Arguments]    ${locator}    ${text}    ${index}=0
