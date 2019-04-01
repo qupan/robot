@@ -194,3 +194,30 @@ def create_app_headlesschrome_options(deviceName='Mei Zu'):
 	chrome_options.add_experimental_option('mobileEmulation',devname)
 	# chrome_options.add_argument('--window-size=1920,1080')
 	return chrome_options
+
+def convert_json(**kargs):
+	'''
+	输入入参数据，将数据转换成json格式并返回
+	输入格式为：number=23,false=False,true=True,none=None
+	'''
+	data = {}
+	for i,j in kargs.items():
+		if (j == "False") or (j == "false"):
+			data[i] = False
+		elif (j == "True") or (j == "true"):
+			data[i] = True
+		elif (j == "None") or (j == "null"):
+			data[i] = None
+		elif j.isdigit() == True:
+			data[i] = int(j)
+		else:
+			data[i] = j
+	json_data = json.dumps(data,indent=4,ensure_ascii=False)
+	return json_data
+
+
+if __name__=='__main__':
+	# data=read_excel('C:\\Project\\000-Deomo\\data\\xml-data.xlsx')
+	# print(data[0][0])
+	data=convert_json(announceId="False",grade="水瓶座",code="200",cc="None",dd='dfkan')
+	print(data)
