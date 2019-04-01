@@ -11,6 +11,7 @@ Library           Process
 Library           Dialogs
 Library           Screenshot
 Library           Telnet
+Library           RequestsLibrary
 Library           MyKeyword.py
 Resource          message.txt
 
@@ -29,7 +30,7 @@ Resource          message.txt
 判断元素个数并显示
     [Arguments]    ${locator}    ${index}=0
     ${number}    evaluate    ${index}+1
-    :FOR    ${i}    IN RANGE    50
+    : FOR    ${i}    IN RANGE    50
     \    wait until page contains element    ${locator}    30
     \    Wait Until Element Is Visible    ${locator}    30
     \    @{element}    Get WebElements    ${locator}
@@ -55,23 +56,8 @@ Win_Kill
 Linux_Kill
     [Documentation]    Linux环境中运行完毕后关闭谷歌浏览器的驱动
     Close All Browsers
-    Comment    evaluate    os.system('killall chrome')    os
-    Comment    evaluate    os.system('killall chromedriver')    os
-
-关闭进程
-    [Documentation]    运行用例前，关闭所有的 浏览器（ie，火狐，谷歌）
-    ...    针对特殊场景，跑用例之前必须关掉所有的浏览器
-    evaluate    os.system('taskkill /f /im firefox.exe')    os
-    evaluate    os.system('taskkill /f /im chrome.exe')    os
-    evaluate    os.system('taskkill /f /im iexplore.exe')    os
-
-谷歌后台浏览器
-    [Arguments]    ${url}
-    [Documentation]    使用谷歌后台浏览器运行用例，现在不怎么用了，最新版的robotframework中已经支持谷歌和火狐后后运行的模式了，很简单
-    ${options}    MyKeyword.Create Headlesschrome Options
-    Create Webdriver    Chrome    chrome_options=${options}
-    Go To    ${url}
-    reload page
+    evaluate    os.system('killall chrome')    os
+    evaluate    os.system('killall chromedriver')    os
 
 打开浏览器
     [Arguments]    ${url}    ${browser}=headlesschrome
@@ -268,7 +254,7 @@ canvas输入文本
     ...    参数${locator}：是定位 方式；
     ...    参数${text}：是标签li中的文本值；
     ...    ${index}是元素索引：当li中的文本不唯一时候使用索引值；
-    @{el}    得到所有元素    ${locator}    #因为第一个定位参数不能默认值，所以只能传入唯一定位
+    @{el}    判断元素个数并包含    ${locator}    0    #因为第一个定位参数不能默认值，所以只能传入唯一定位
     ${name}    evaluate    str(time.time()).replace('.','')    time
     Assign Id To Element    @{el}[0]    id_01_${name}    #给下拉框标签添加id
     : FOR    ${i}    IN RANGE    50
@@ -499,7 +485,6 @@ div滚动条left
 打开新页面
     [Arguments]    ${url}
     [Documentation]    打开新的网址，参数${url} ：是网址
-    sleep    3
     execute javascript    window.open('${url}')
 
 切换frame
@@ -518,37 +503,15 @@ div滚动条left
     [Documentation]    返回主frame
     Unselect Frame
 
-得到窗口
-    [Documentation]    得到当前所有窗口句柄的列表；
-    ...    并将@{handle}的值返回
-    sleep    3
-    @{handle}    get window handles
-    [Return]    @{handle}
-
-句柄切换窗口
-    [Arguments]    ${x}    ${y}
-    [Documentation]    要跳转到第3个窗口，输入3个窗口的列表和2个窗口的列表；
-    ...    要跳转到第2个窗口，输入2个窗口的列表和1个窗口的列表；
-    ...    要跳转到第1个窗口，输入1个窗口的列表和1个空的列表；
-    ...    两个列表的前后没有关系
-    ${z}    evaluate    [list(set(${x})-set(${y}))[0] if len(${x}) > len(${y}) else list(set(${y})-set(${x}))[0]]
-    sleep    3
-    select window    ${z[0]}
-    maximize browser window
-
-回到主窗口
-    [Documentation]    返回到主窗口
-    sleep    2
-    select window    main
-
-跳到新窗口
+切换窗口
     [Arguments]    ${locator}
-    [Documentation]    跳转到新窗口，只针对有两个页面的情况
-    sleep    2
+    [Documentation]    跳转到新窗口
+    ...    ${locator}是定位策略：
+    ...    1、使用new关键字跳转到最新的页面：New
+    ...    2、使用main关键字跳转到主页面：main
+    ...    3、使用标题title切换：title=百度
+    ...    4、使用网址url切换：url=https://www.baidu.com/
     select window    ${locator}
-
-窗口最大化
-    maximize browser window
 
 关闭窗口
     close window
@@ -557,15 +520,26 @@ div滚动条left
     [Arguments]    ${addr}=default
     ${time}    evaluate    time.strftime('%Y.%m.%d.%H.%M.%S')    time
     ${addr_first}    evaluate    [str(pathlib2.Path('${CURDIR}').parent/'screenshot') if '${addr}' == 'default' else str(pathlib2.Path('${CURDIR}').parent/'screenshot/${addr}')]    pathlib2
-    Comment    evaluate    pathlib2.Path('${addr_first[0]}').mkdir(parents=True,exist_ok=True)    pathlib2
     Selenium2Library.Capture Page Screenshot    ${addr_first[0]}/${time}.png
 
 回车
-    [Arguments]    ${locator}
-    press key    ${locator}    \\13
+    [Arguments]    ${locator}    ${index}=0
+    @{el}    判断元素个数并包含    ${locator}    ${index}
+    : FOR    ${i}    IN RANGE    50
+    \    ${msg}    Run Keyword And Ignore Error    press key    @{el}[${index}]    \\13
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    press key    @{el}[${index}]    \\13
 
-点击弹框
-    confirm action    #点击弹框中的确定
+弹框确定
+    #点击弹框中的确定
+    ${msg}    Handle Alert    timeout=30 s
+    [Return]    ${msg}
+
+弹框取消
+    #点击弹框中的取消
+    ${msg}    Handle Alert    action=DISMISS    timeout=30 s
+    [Return]    ${msg}
 
 包含检查点
     [Arguments]    ${actual}    ${expect}
@@ -588,7 +562,7 @@ div滚动条left
     [Documentation]    参数${locator}：是定位 方式，例如：id=kw；
     ...    参数${name}：是要得到的属性名称；
     ...    ${index}是元素索引：当定位是一组元素时候使用；
-    @{el}    得到所有元素    ${locator}
+    @{el}    判断元素个数并包含    ${locator}    ${index}
     Set Focus To Element    @{el}[${index}]
     ${atrr}    Selenium2Library.Get Element Attribute    @{el}[${index}]    ${name}
     [Return]    ${atrr}
@@ -617,7 +591,7 @@ py输入时间
     ${t2}    Date Weekend    ${y}    ${z}    ${t1}
     wait until page contains element    ${locator}    30    page not contains element
     ${t3}    get current date
-    assign id to element    ${x}    ${t3}
+    assign id to element    ${locator}    ${t3}
     execute javascript    window.document.getElementById('${t3}').value='${t2}'
     #给input标签输入日期    参数${x}是定位方式    参数${y}是：是否判断周末 判断输入yes，不判断输入no    ${d}:增减的天数
     #${z},增加日期输入+ 减少日期输入-    参数${d}是要减少或增加的天数
@@ -641,32 +615,9 @@ py输入礼拜四
     Set Global Variable    ${data}    ${z[${index}]}
     [Return]    @{z[${index}]}
 
-结束打开报告
-    打开浏览器    file:///D:/robot/report/log.html    gc
-    reload page
-    打开新页面    file:///D:/robot/report/report.html
-    reload page
-    evaluate    os.system('taskkill /f /im IEDriverServer.exe')    os
-    evaluate    os.system('taskkill /f /im chromedriver.exe')    os
-
-等待
-    [Arguments]    ${x}
-    sleep    ${x}
-    #参数${number}为输入 的秒数
-
 解压文件
     [Arguments]    ${x}    ${y}
     evaluate    os.system("WinRAR x ${x} ${y}")    os
-
-HR用户名
-    [Arguments]    ${x}
-    [Documentation]    参数${x}输入人员，中文姓名
-    ${x}    Set Variable    ${CURDIR}
-    ${x1}    Set Variable    ${x.split('\word')[0]}
-    ${excel_address}    连接字符串    ${x1}    \\py\\read_oracle.py    #得到脚本存放存放地址
-    import library    ${excel_address}
-    ${user}    read_oracle    select USER_NOTESNAME,USER_SHORTNAME from v_emp where USER_NOTESNAME=    ${x}
-    [Return]    ${user}
 
 得到当前网址
     ${url}    Get Location
