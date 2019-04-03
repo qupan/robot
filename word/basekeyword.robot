@@ -107,20 +107,6 @@ Linux_Kill
     RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
     ...    ELSE IF    "${msg[0]}" == "FAIL"    click element    @{el}[${index}]
 
-点击文本
-    [Arguments]    ${label}    ${text}    ${index}=0
-    [Documentation]    使用标签之间的文本来点击元素
-    ...    ${label}：是元素便签的名字，例如：a，span，div等
-    ...    ${text} ：是元素标签之间的文本
-    ...    ${index}：如果得到的是多个元素，输入所需元素的索引
-    ${locator}    evaluate    'xpath://{}[contains(string(),"${text}")]'.format("${label}")
-    @{el}    判断元素个数并包含    ${locator}    ${index}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    click element    @{el}[${index}]
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    click element    @{el}[${index}]
-
 点击按钮
     [Arguments]    ${locator}    ${index}=0
     [Documentation]    参数${locator}：是定位 方式 例如：id=kw
