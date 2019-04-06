@@ -13,7 +13,6 @@ Library           Screenshot
 Library           Telnet
 Library           RequestsLibrary
 Library           MyKeyword.py
-Resource          message.txt
 
 *** Keywords ***
 判断元素个数并包含
@@ -69,6 +68,7 @@ Linux_Kill
     ...    火狐浏览器 --- ff
     ...    谷歌后台模式 --- headlesschrome
     ...    火狐后台模式 --- headlessfirefox
+    Append To Environment Variable    PATH    /usr/local/bin
     open browser    ${url}    ${browser}
     Maximize Browser Window
     reload page
@@ -85,6 +85,7 @@ Linux_Kill
 关闭所有浏览器
     [Documentation]    关闭所有浏览器
     close all browsers
+    退出驱动
 
 鼠标悬停
     [Arguments]    ${locator}    ${index}=0
