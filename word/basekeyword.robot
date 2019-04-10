@@ -250,7 +250,7 @@ canvas输入文本
     RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
     ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    document.querySelector('#id_01_${name}').click()
     ${label}    BuiltIn.Set Variable    li
-    ${locator}    evaluate    'xpath://{}[contains(text(),"${text}")]'.format("${label}")
+    ${locator}    evaluate    'xpath://{}[contains(string(),"${text}")]'.format("${label}")
     @{el}    判断元素个数并包含    ${locator}    ${index}
     Assign Id To Element    @{el}[${index}]    id_02_${name}    #给li标签添加id
     : FOR    ${i}    IN RANGE    50
