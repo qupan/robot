@@ -498,8 +498,26 @@ div滚动条left
     ...    2、使用main关键字跳转到主页面：main
     ...    3、使用标题title切换：title=百度
     ...    4、使用网址url切换：url=https://www.baidu.com/
-    select window    ${locator}
-
+    @{msg}    create list    ${EMPTY}
+    :FOR    ${i}    IN RANGE    50
+    \    @{h}    Get Window Handles
+    \    ${len}    得到长度    ${h}
+    \    Exit For Loop If    ${len} >= 2
+    :FOR    ${i}    IN    @{h}
+    \    select window    ${i}
+    \    ${title}    Get Title 
+    \    ${url}    Get Location
+    \    @{msg_2}    create list    ${i}    ${title}    ${url}
+    \    Append To List    ${msg}    ${msg_2}
+    log    ${msg}
+    :FOR    ${i}    IN    @{msg}
+    \    窗口循环   ${i}    ${locator}
+    RUN KEYWORD IF    "${locator}" == "main"    select window    main
+窗口循环
+    [Arguments]    ${list_01}    ${locator}
+    :FOR    ${j}    IN    ${list_01}
+    \    log    ${j}
+    \    RUN KEYWORD IF    "${j}" == "${locator}"    select window    ${list_01[0]}
 关闭窗口
     close window
 
