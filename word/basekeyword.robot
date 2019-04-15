@@ -13,6 +13,7 @@ Library           Screenshot
 Library           Telnet
 Library           RequestsLibrary
 Library           MyKeyword.py
+Library           AutoItLibrary
 
 *** Keywords ***
 判断元素个数并包含
@@ -51,6 +52,7 @@ Win_Kill
     evaluate    os.system('taskkill /f /im IEDriverServer.exe')    os
     evaluate    os.system('taskkill /f /im chromedriver.exe')    os
     evaluate    os.system('taskkill /f /im geckodriver.exe')    os
+    evaluate    os.system('taskkill /f /im MicrosoftWebDriver.exe')    os
 
 Linux_Kill
     [Documentation]    Linux环境中运行完毕后关闭谷歌浏览器的驱动
@@ -250,7 +252,7 @@ canvas输入文本
     RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
     ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    document.querySelector('#id_01_${name}').click()
     ${label}    BuiltIn.Set Variable    li
-    ${locator}    evaluate    'xpath://{}[contains(string(),"${text}")]'.format("${label}")
+    ${locator}    evaluate    'xpath://{}[contains(text(),"${text}")]'.format("${label}")
     @{el}    判断元素个数并包含    ${locator}    ${index}
     Assign Id To Element    @{el}[${index}]    id_02_${name}    #给li标签添加id
     : FOR    ${i}    IN RANGE    50
@@ -374,7 +376,7 @@ js点击
 js点击文本
     [Arguments]    ${label}    ${text}    ${index}=0
     [Documentation]    使用标签之间的文本来点击元素
-    ...    ${label}：是元素便签的名字，例如：a，span，div等
+    ...    ${label}：是元素标签的名字，例如：a，span，div等
     ...    ${text} ：是元素标签之间的文本
     ...    ${index}：如果得到的是多个元素，输入所需元素的索引
     ${locator}    evaluate    'xpath://{}[contains(string(),"${text}")]'.format("${label}")
@@ -419,7 +421,7 @@ js得到文本
     ...    ELSE IF    "${msg[0]}" == "FAIL"    BuiltIn.Should Not Be Empty    ${text}
     [Return]    ${text}
 
-js上传文件
+js上传
     [Arguments]    ${file_path}    ${index}=0
     [Documentation]    js上传文件
     ...    参数${file_path} ：是要上传文件的地址包括后缀名称
@@ -432,6 +434,18 @@ js上传文件
     RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
     ...    ELSE IF    "${msg[0]}" == "FAIL"    Choose File    @{el}[${index}]    ${file_path}
     execute javascript    document.querySelectorAll('[type="file"]')[${index}].style="display: none;"
+
+一般上传
+    [Arguments]    ${locator}    ${file_path}    ${index}=0
+    [Documentation]    1、参数${locator}：是上传框的定位
+    ...    2、参数${file_path}：是要上传文件的路径
+    ...    3、参数${index}是元素索引，当得到一组元素进行使用
+    @{el}    判断元素个数并包含    ${locator}    ${index}
+    : FOR    ${i}    IN RANGE    50
+    \    ${msg}    Run Keyword And Ignore Error    Choose File    @{el}[${index}]    ${file_path}
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    Choose File    @{el}[${index}]    ${file_path}
 
 div滚动条
     [Arguments]    ${locator}    ${number}    ${index}=0
@@ -494,30 +508,31 @@ div滚动条left
     [Arguments]    ${locator}
     [Documentation]    跳转到新窗口
     ...    ${locator}是定位策略：
-    ...    1、使用new关键字跳转到最新的页面：New
-    ...    2、使用main关键字跳转到主页面：main
-    ...    3、使用标题title切换：title=百度
-    ...    4、使用网址url切换：url=https://www.baidu.com/
-    @{msg}    create list    ${EMPTY}
-    :FOR    ${i}    IN RANGE    50
+    ...    1、使用main关键字跳转到主页面：main
+    ...    2、使用标题title切换，直接输入网页标题即可：百度
+    ...    3、使用网址url切换，直接输入网页网址即可：https://www.baidu.com/
+    @{msg}    create list    [1,2,3]
+    : FOR    ${i}    IN RANGE    50
     \    @{h}    Get Window Handles
     \    ${len}    得到长度    ${h}
     \    Exit For Loop If    ${len} >= 2
-    :FOR    ${i}    IN    @{h}
+    : FOR    ${i}    IN    @{h}
     \    select window    ${i}
-    \    ${title}    Get Title 
+    \    ${title}    Get Title
     \    ${url}    Get Location
     \    @{msg_2}    create list    ${i}    ${title}    ${url}
     \    Append To List    ${msg}    ${msg_2}
-    log    ${msg}
-    :FOR    ${i}    IN    @{msg}
-    \    窗口循环   ${i}    ${locator}
+    #log    ${msg}
+    : FOR    ${i}    IN    @{msg}
+    \    窗口循环    ${i}    ${locator}
     RUN KEYWORD IF    "${locator}" == "main"    select window    main
+
 窗口循环
     [Arguments]    ${list_01}    ${locator}
-    :FOR    ${j}    IN    ${list_01}
-    \    log    ${j}
-    \    RUN KEYWORD IF    "${j}" == "${locator}"    select window    ${list_01[0]}
+    : FOR    ${j}    IN RANGE    3
+    \    #log    ${j}
+    \    RUN KEYWORD IF    "${list_01[${j}]}" == "${locator}"    select window    ${list_01[0]}
+
 关闭窗口
     close window
 
@@ -673,8 +688,8 @@ json转换
     wait until page contains element    css:#id_${name} tbody tr:first-child td    30
     ${row}    Execute Javascript    return document.querySelectorAll('#id_${name} tr').length
     ${col}    Execute Javascript    return document.querySelectorAll('#id_${name} tbody tr:first-child td').length
-    @{msg}    create list    表格是一个： ${row} 行 ${col} 列的表格
-    @{demo_01}    create list    要查找的文字所在位置为：
+    @{msg}    create list    Table is a :  ${row} row ${col} col
+    @{demo_01}    create list    Your find text in Cell :
     BuiltIn.Set Global Variable    ${demo}    ${demo_01}
     : FOR    ${i}    IN RANGE    1    ${row}+1
     \    表格数据    @{el}[${index}]    ${i}    ${col}    ${text}
