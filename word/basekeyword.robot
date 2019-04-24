@@ -12,7 +12,6 @@ Library           Dialogs
 Library           Screenshot
 Library           Telnet
 Library           RequestsLibrary
-Library           MyKeyword.py
 Library           AutoItLibrary
 
 *** Keywords ***
@@ -244,6 +243,27 @@ canvas输入文本
     ...    参数${text}：是标签li中的文本值；
     ...    ${index}是元素索引：当li中的文本不唯一时候使用索引值；
     @{el}    判断元素个数并包含    ${locator}    0    #因为第一个定位参数不能默认值，所以只能传入唯一定位
+    : FOR    ${i}    IN RANGE    50
+    \    ${msg}    Run Keyword And Ignore Error    click element    @{el}[0]
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    click element    @{el}[0]
+    ${label}    BuiltIn.Set Variable    li
+    ${locator}    evaluate    'xpath://{}[contains(string(),"${text}")]'.format("${label}")
+    @{el}    判断元素个数并包含    ${locator}    ${index}
+    : FOR    ${i}    IN RANGE    50
+    \    ${msg}    Run Keyword And Ignore Error    click element    @{el}[0]
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    click element    @{el}[0]
+
+非标准下拉框js
+    [Arguments]    ${locator}    ${text}    ${index}=0
+    [Documentation]    使用标签值选择列表下拉框；
+    ...    参数${locator}：是定位 方式；
+    ...    参数${text}：是标签li中的文本值；
+    ...    ${index}是元素索引：当li中的文本不唯一时候使用索引值；
+    @{el}    判断元素个数并包含    ${locator}    0    #因为第一个定位参数不能默认值，所以只能传入唯一定位
     ${name}    evaluate    str(time.time()).replace('.','')    time
     Assign Id To Element    @{el}[0]    id_01_${name}    #给下拉框标签添加id
     : FOR    ${i}    IN RANGE    50
@@ -252,7 +272,7 @@ canvas输入文本
     RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
     ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    document.querySelector('#id_01_${name}').click()
     ${label}    BuiltIn.Set Variable    li
-    ${locator}    evaluate    'xpath://{}[contains(text(),"${text}")]'.format("${label}")
+    ${locator}    evaluate    'xpath://{}[contains(string(),"${text}")]'.format("${label}")
     @{el}    判断元素个数并包含    ${locator}    ${index}
     Assign Id To Element    @{el}[${index}]    id_02_${name}    #给li标签添加id
     : FOR    ${i}    IN RANGE    50
@@ -315,6 +335,24 @@ jq点击文本
     RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
     ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    $('#id_${name}').click()
 
+jq得到文本
+    [Arguments]    ${label}    ${text}    ${index}=0
+    [Documentation]    使用标签之间的文本来得到文本
+    ...    ${label}：是元素便签的名字，例如：a，span，div等
+    ...    ${text} ：是元素标签之间的文本
+    ...    ${index}：如果得到的是多个元素，输入所需元素的索引
+    ${locator}    evaluate    'xpath://{}[contains(text(),"${text}")]'.format("${label}")
+    @{el}    判断元素个数并包含    ${locator}    ${index}
+    ${name}    evaluate    str(time.time()).replace('.','')    time
+    Assign Id To Element    @{el}[${index}]    id_${name}
+    : FOR    ${i}    IN RANGE    50
+    \    ${text}    execute javascript    return $('#id_${name}').text()
+    \    ${msg}    Run Keyword And Ignore Error    BuiltIn.Should Not Be Empty    ${text}
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    BuiltIn.Should Not Be Empty    ${text}
+    [Return]    ${text}
+
 jq双击
     [Arguments]    ${locator}    ${index}=0
     [Documentation]    jq定位是使用jquery定位
@@ -341,24 +379,6 @@ jq输入
     \    Exit For Loop If    "${msg[0]}" == "PASS"
     RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
     ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    $('${css}').eq(${index}).val('${text}')
-
-jq得到文本
-    [Arguments]    ${label}    ${text}    ${index}=0
-    [Documentation]    使用标签之间的文本来得到文本
-    ...    ${label}：是元素便签的名字，例如：a，span，div等
-    ...    ${text} ：是元素标签之间的文本
-    ...    ${index}：如果得到的是多个元素，输入所需元素的索引
-    ${locator}    evaluate    'xpath://{}[contains(text(),"${text}")]'.format("${label}")
-    @{el}    判断元素个数并包含    ${locator}    ${index}
-    ${name}    evaluate    str(time.time()).replace('.','')    time
-    Assign Id To Element    @{el}[${index}]    id_${name}
-    : FOR    ${i}    IN RANGE    50
-    \    ${text}    execute javascript    return $('#id_${name}').text()
-    \    ${msg}    Run Keyword And Ignore Error    BuiltIn.Should Not Be Empty    ${text}
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    BuiltIn.Should Not Be Empty    ${text}
-    [Return]    ${text}
 
 js点击
     [Arguments]    ${locator}    ${index}=0
@@ -688,7 +708,7 @@ json转换
     wait until page contains element    css:#id_${name} tbody tr:first-child td    30
     ${row}    Execute Javascript    return document.querySelectorAll('#id_${name} tr').length
     ${col}    Execute Javascript    return document.querySelectorAll('#id_${name} tbody tr:first-child td').length
-    @{msg}    create list    Table is a :  ${row} row ${col} col
+    @{msg}    create list    Table is a : \ ${row} row ${col} col
     @{demo_01}    create list    Your find text in Cell :
     BuiltIn.Set Global Variable    ${demo}    ${demo_01}
     : FOR    ${i}    IN RANGE    1    ${row}+1
