@@ -1,5 +1,5 @@
 *** Settings ***
-Library           Selenium2Library    timeout=30
+Library           Selenium2Library
 Library           DateTime
 Library           Collections
 Library           String
@@ -15,23 +15,13 @@ Library           RequestsLibrary
 Library           AutoItLibrary
 
 *** Keywords ***
-判断元素个数并包含
+等待元素出现
     [Arguments]    ${locator}    ${index}=0
     ${number}    evaluate    ${index}+1
     : FOR    ${i}    IN RANGE    50
     \    wait until page contains element    ${locator}    30    page not contains element
-    \    @{element}    Get WebElements    ${locator}
-    \    ${len}    得到长度    ${element}
-    \    Exit For Loop If    ${len} >= ${number}
-    Set Focus To Element    @{element}[${index}]
-    [Return]    @{element}
-
-判断元素个数并显示
-    [Arguments]    ${locator}    ${index}=0
-    ${number}    evaluate    ${index}+1
-    : FOR    ${i}    IN RANGE    50
-    \    wait until page contains element    ${locator}    30
-    \    Wait Until Element Is Visible    ${locator}    30
+    \    Run Keyword And Ignore Error    Wait Until Element Is Visible    ${locator}    10    element is not visible
+    \    Wait Until Element Is Enabled    ${locator}    30    element is not Enabled
     \    @{element}    Get WebElements    ${locator}
     \    ${len}    得到长度    ${element}
     \    Exit For Loop If    ${len} >= ${number}
@@ -82,6 +72,7 @@ Linux_Kill
     [Documentation]    关闭浏览器
     sleep    2
     close browser
+    退出驱动
 
 关闭所有浏览器
     [Documentation]    关闭所有浏览器
@@ -90,69 +81,48 @@ Linux_Kill
 
 鼠标悬停
     [Arguments]    ${locator}    ${index}=0
-    @{el}    判断元素个数并包含    ${locator}    ${index}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    Mouse Over    @{el}[${index}]
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    Mouse Over    @{el}[${index}]
+    [Documentation]    悬浮鼠标。
+    ...    参数${locator}：是定位 方式 例如：id=kw
+    ...    ${index}是元素索引：当定位是一组元素时候使用
+    @{el}    等待元素出现    ${locator}    ${index}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    Mouse Over    @{el}[${index}]
 
 点击元素
     [Arguments]    ${locator}    ${index}=0
     [Documentation]    点击元素。
     ...    参数${locator}：是定位 方式 例如：id=kw
     ...    ${index}是元素索引：当定位是一组元素时候使用
-    @{el}    判断元素个数并包含    ${locator}    ${index}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    click element    @{el}[${index}]
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    click element    @{el}[${index}]
+    @{el}    等待元素出现    ${locator}    ${index}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    click element    @{el}[${index}]
 
 点击按钮
     [Arguments]    ${locator}    ${index}=0
     [Documentation]    参数${locator}：是定位 方式 例如：id=kw
     ...    ${index}是元素索引：当定位是一组元素时候使用，
-    @{el}    判断元素个数并包含    ${locator}    ${index}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    Click Button    @{el}[${index}]
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    Click Button    @{el}[${index}]
+    @{el}    等待元素出现    ${locator}    ${index}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    Click Button    @{el}[${index}]
 
 点击链接
     [Arguments]    ${locator}    ${index}=0
     [Documentation]    参数${locator}：是定位 方式 例如：id=kw
     ...    ${index}是元素索引：当定位是一组元素时候使用，
-    @{el}    判断元素个数并包含    ${locator}    ${index}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    Click Link    @{el}[${index}]
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    Click Link    @{el}[${index}]
+    @{el}    等待元素出现    ${locator}    ${index}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    Click Link    @{el}[${index}]
 
 双击
     [Arguments]    ${locator}    ${index}=0
     [Documentation]    参数${locator}：是定位 方式 例如：id=kw
     ...    ${index}是元素索引：当定位是一组元素时候使用，
-    @{el}    判断元素个数并包含    ${locator}    ${index}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    double click element    @{el}[${index}]
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    double click element    @{el}[${index}]
+    @{el}    等待元素出现    ${locator}    ${index}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    double click element    @{el}[${index}]
 
 输入文本
     [Arguments]    ${locator}    ${text}    ${index}=0
     [Documentation]    参数${locator}：是定位 方式，例如：id=kw；
     ...    ${text}是输入的文本；
     ...    ${index}是元素索引：当定位是一组元素时候使用
-    @{el}    判断元素个数并包含    ${locator}    ${index}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    input text    @{el}[${index}]    ${text}
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    input text    @{el}[${index}]    ${text}
+    @{el}    等待元素出现    ${locator}    ${index}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    input text    @{el}[${index}]    ${text}
 
 canvas输入文本
     [Arguments]    ${locator}    ${text}    @{size}
@@ -166,7 +136,7 @@ canvas输入文本
     ${x}    得到长度    ${size}
     ${index}    BuiltIn.Run Keyword If    ${x} == 3    BuiltIn.Set Variable    0
     ...    ELSE IF    ${x} == 4    BuiltIn.Set Variable    @{size}[0]
-    @{el}    判断元素个数并包含    ${locator}    ${index}
+    @{el}    等待元素出现    ${locator}    ${index}
     ${name}    evaluate    str(time.time()).replace('.','')    time
     Assign Id To Element    @{el}[${index}]    id_01_${name}    #给canvas标签添加id
     BuiltIn.Run Keyword If    ${x} == 3    Execute Javascript    el=document.querySelector('#id_01_${name}');context=el.getContext("2d");context.fillStyle='#000000';context.font = "bold @{size}[0]px Arial";context.textAlign = "left";context.textBaseline = "middle";context.strokeText("${text}", @{size}[1], @{size}[2]);
@@ -177,38 +147,26 @@ canvas输入文本
     [Documentation]    ${locator}定位；
     ...    参数${locator}:是定位；
     ...    参数${index}：是索引，当得到一组元素时候使用；
-    @{el}    判断元素个数并包含    ${locator}    ${index}
+    @{el}    等待元素出现    ${locator}    ${index}
     ${time}    evaluate    str(time.time()).replace('.','')    time
     Assign Id To Element    @{el}[${index}]    id_${time}
     Execute Javascript    document.querySelectorAll('#id_${time}')[0].setAttribute('name','radio_${time}')    #新增name的属性，如果有的话进行修改成新的
     Execute Javascript    document.querySelectorAll('#id_${time}')[0].setAttribute('value','radio_${time}')    #新增value的属性，如果有的话进行修改成新的
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    select radio button    radio_${time}    radio_${time}
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    select radio button    radio_${time}    radio_${time}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    select radio button    radio_${time}    radio_${time}
 
 点击checkbox
     [Arguments]    ${locator}    ${index}=0
     [Documentation]    点击复选框；参数${locator}：是定位 方式 例如：id=kw
     ...    ${index}是元素索引：当定位是一组元素时候使用
-    @{el}    判断元素个数并包含    ${locator}    ${index}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    select checkbox    @{el}[${index}]
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    select checkbox    @{el}[${index}]
+    @{el}    等待元素出现    ${locator}    ${index}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    select checkbox    @{el}[${index}]
 
 取消checkbox
     [Arguments]    ${locator}    ${index}=0
     [Documentation]    取消选择复选框；参数${locator}：是定位 方式 例如：id=kw
     ...    ${index}是元素索引：当定位是一组元素时候使用
-    @{el}    判断元素个数并包含    ${locator}    ${index}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    unselect checkbox    @{el}[${index}]
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    unselect checkbox    @{el}[${index}]
+    @{el}    等待元素出现    ${locator}    ${index}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    unselect checkbox    @{el}[${index}]
 
 下拉框
     [Arguments]    ${locator}    ${value}    ${index}=0
@@ -216,12 +174,8 @@ canvas输入文本
     ...    参数${locator}：是定位 方式；
     ...    参数${value}：是标签option中value的值；
     ...    ${index}是元素索引：当定位是一组元素时候使用；
-    @{el}    判断元素个数并包含    ${locator}    ${index}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    select from list by value    @{el}[${index}]    ${value}
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    select from list by value    @{el}[${index}]    ${value}
+    @{el}    等待元素出现    ${locator}    ${index}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    select from list by value    @{el}[${index}]    ${value}
 
 下拉框index
     [Arguments]    ${locator}    ${index_01}    ${index}=0
@@ -229,12 +183,17 @@ canvas输入文本
     ...    参数${locator}：是定位 方式；
     ...    参数${index_01}：是标签中的索引的值；
     ...    ${index}是元素索引：当定位是一组元素时候使用；
-    @{el}    判断元素个数并包含    ${locator}    ${index}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    select from list by index    @{el}[${index}]    ${index_01}
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    select from list by index    @{el}[${index}]    ${index_01}
+    @{el}    等待元素出现    ${locator}    ${index}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    select from list by index    @{el}[${index}]    ${index_01}
+
+下拉框label
+    [Arguments]    ${locator}    ${label}    ${index}=0
+    [Documentation]    使用索引值选择列表下拉框；
+    ...    参数${locator}：是定位 方式；
+    ...    参数${label}：是标签中的文本值；
+    ...    ${index}是元素索引：当定位是一组元素时候使用；
+    @{el}    等待元素出现    ${locator}    ${index}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    Select From List By Label    @{el}[${index}]    ${label}
 
 非标准下拉框
     [Arguments]    ${locator}    ${text}    ${index}=0
@@ -242,20 +201,12 @@ canvas输入文本
     ...    参数${locator}：是定位 方式；
     ...    参数${text}：是标签li中的文本值；
     ...    ${index}是元素索引：当li中的文本不唯一时候使用索引值；
-    @{el}    判断元素个数并包含    ${locator}    0    #因为第一个定位参数不能默认值，所以只能传入唯一定位
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    click element    @{el}[0]
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    click element    @{el}[0]
+    @{el}    等待元素出现    ${locator}    0    #因为第一个定位参数不能默认值，所以只能传入唯一定位
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    click element    @{el}[0]
     ${label}    BuiltIn.Set Variable    li
     ${locator}    evaluate    'xpath://{}[contains(string(),"${text}")]'.format("${label}")
-    @{el}    判断元素个数并包含    ${locator}    ${index}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    click element    @{el}[0]
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    click element    @{el}[0]
+    @{el}    等待元素出现    ${locator}    ${index}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    click element    @{el}[0]
 
 非标准下拉框js
     [Arguments]    ${locator}    ${text}    ${index}=0
@@ -263,29 +214,21 @@ canvas输入文本
     ...    参数${locator}：是定位 方式；
     ...    参数${text}：是标签li中的文本值；
     ...    ${index}是元素索引：当li中的文本不唯一时候使用索引值；
-    @{el}    判断元素个数并包含    ${locator}    0    #因为第一个定位参数不能默认值，所以只能传入唯一定位
+    @{el}    等待元素出现    ${locator}    0    #因为第一个定位参数不能默认值，所以只能传入唯一定位
     ${name}    evaluate    str(time.time()).replace('.','')    time
     Assign Id To Element    @{el}[0]    id_01_${name}    #给下拉框标签添加id
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    execute javascript    document.querySelector('#id_01_${name}').click()
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    document.querySelector('#id_01_${name}').click()
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    execute javascript    document.querySelector('#id_01_${name}').click()
     ${label}    BuiltIn.Set Variable    li
     ${locator}    evaluate    'xpath://{}[contains(string(),"${text}")]'.format("${label}")
-    @{el}    判断元素个数并包含    ${locator}    ${index}
+    @{el}    等待元素出现    ${locator}    ${index}
     Assign Id To Element    @{el}[${index}]    id_02_${name}    #给li标签添加id
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    execute javascript    document.querySelector('#id_02_${name}').click()
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    document.querySelector('#id_02_${name}').click()
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    execute javascript    document.querySelector('#id_02_${name}').click()
 
 得到文本
     [Arguments]    ${locator}    ${index}=0
     [Documentation]    得到页面元素的文本；
     ...    参数${locator}是元素的定位
-    @{el}    判断元素个数并包含    ${locator}    ${index}
+    @{el}    等待元素出现    ${locator}    ${index}
     : FOR    ${i}    IN RANGE    50
     \    ${text}    get text    @{el}[${index}]
     \    ${msg}    Run Keyword And Ignore Error    BuiltIn.Should Not Be Empty    ${text}
@@ -296,28 +239,21 @@ canvas输入文本
 
 移动滑块
     [Arguments]    ${locator}    ${index}=0
-    [Documentation]    点击元素。
+    [Documentation]    移动验证滑块。
     ...    参数${locator}：是定位 方式 例如：id=kw
     ...    ${index}是元素索引：当定位是一组元素时候使用
-    @{el}    判断元素个数并包含    ${locator}    ${index}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    Drag And Drop By Offset    @{el}[${index}]    10000    0
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    Drag And Drop By Offset    @{el}[${index}]    10000    0
+    @{el}    等待元素出现    ${locator}    ${index}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    Drag And Drop By Offset    @{el}[${index}]    10000    0
 
 jq点击
     [Arguments]    ${locator}    ${index}=0
-    [Documentation]    jq定位是使用jquery定位
+    [Documentation]    使用jquery进行点击
     ...    参数${locator}:是定位；
     ...    参数${index}：是索引，当得到一组元素时候使用；
-    判断元素个数并包含    ${locator}    ${index}
-    ${css}    set variable    ${locator[7:]}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    execute javascript    $('${css}').eq(${index}).click()
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    $('${css}').eq(${index}).click()
+    等待元素出现    ${locator}    ${index}
+    ${name}    evaluate    str(time.time()).replace('.','')    time
+    Assign Id To Element    @{el}[${index}]    id_${name}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    execute javascript    $('#id_${name}').eq(${index}).click()
 
 jq点击文本
     [Arguments]    ${label}    ${text}    ${index}=0
@@ -326,72 +262,41 @@ jq点击文本
     ...    ${text} ：是元素标签之间的文本
     ...    ${index}：如果得到的是多个元素，输入所需元素的索引
     ${locator}    evaluate    'jquery:{}:contains("${text}")'.format("${label}")
-    @{el}    判断元素个数并包含    ${locator}    ${index}
+    @{el}    等待元素出现    ${locator}    ${index}
     ${name}    evaluate    str(time.time()).replace('.','')    time
     Assign Id To Element    @{el}[${index}]    id_${name}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    execute javascript    $('#id_${name}').click()
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    $('#id_${name}').click()
-
-jq得到文本
-    [Arguments]    ${label}    ${text}    ${index}=0
-    [Documentation]    使用标签之间的文本来得到文本
-    ...    ${label}：是元素便签的名字，例如：a，span，div等
-    ...    ${text} ：是元素标签之间的文本
-    ...    ${index}：如果得到的是多个元素，输入所需元素的索引
-    ${locator}    evaluate    'xpath://{}[contains(text(),"${text}")]'.format("${label}")
-    @{el}    判断元素个数并包含    ${locator}    ${index}
-    ${name}    evaluate    str(time.time()).replace('.','')    time
-    Assign Id To Element    @{el}[${index}]    id_${name}
-    : FOR    ${i}    IN RANGE    50
-    \    ${text}    execute javascript    return $('#id_${name}').text()
-    \    ${msg}    Run Keyword And Ignore Error    BuiltIn.Should Not Be Empty    ${text}
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    BuiltIn.Should Not Be Empty    ${text}
-    [Return]    ${text}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    execute javascript    $('#id_${name}').click()
 
 jq双击
     [Arguments]    ${locator}    ${index}=0
-    [Documentation]    jq定位是使用jquery定位
+    [Documentation]    使用jquery点击
     ...    参数${locator}:是定位；
     ...    参数${index}：是索引，当得到一组元素时候使用；
-    判断元素个数并包含    ${locator}    ${index}
-    ${css}    set variable    ${locator[7:]}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    execute javascript    $('${css}').eq(${index}).dblclick()
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    $('${css}').eq(${index}).dblclick()
+    等待元素出现    ${locator}    ${index}
+    ${name}    evaluate    str(time.time()).replace('.','')    time
+    Assign Id To Element    @{el}[${index}]    id_${name}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    execute javascript    $('#id_${name}').eq(${index}).dblclick()
 
 jq输入
     [Arguments]    ${locator}    ${text}    ${index}=0
-    [Documentation]    jq定位是使用jquery定位
+    [Documentation]    使用jquery输入文本
     ...    参数${locator}:是定位；
     ...    参数${index}：是索引，当得到一组元素时候使用；
     ...    参数${text}：是要输入的文本
-    判断元素个数并包含    ${locator}    ${index}
-    ${css}    set variable    ${locator[7:]}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    execute javascript    $('${css}').eq(${index}).val('${text}')
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    $('${css}').eq(${index}).val('${text}')
+    等待元素出现    ${locator}    ${index}
+    ${name}    evaluate    str(time.time()).replace('.','')    time
+    Assign Id To Element    @{el}[${index}]    id_${name}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    execute javascript    $('#id_${name}').eq(${index}).val('${text}')
 
 js点击
     [Arguments]    ${locator}    ${index}=0
-    [Documentation]    js定位只能使用css语法；
+    [Documentation]    使用js点击；
     ...    参数${locator}:是定位；
     ...    参数${index}：是索引，当得到一组元素时候使用；
-    判断元素个数并包含    ${locator}    ${index}
-    ${css}    set variable    ${locator[4:]}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    execute javascript    document.querySelectorAll('${css}')[${index}].click()
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    document.querySelectorAll('${css}')[${index}].click()
+    @{el}    等待元素出现    ${locator}    ${index}
+    ${name}    evaluate    str(time.time()).replace('.','')    time
+    Assign Id To Element    @{el}[${index}]    id_${name}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    execute javascript    document.querySelectorAll('#id_${name}')[${index}].click()
 
 js点击文本
     [Arguments]    ${label}    ${text}    ${index}=0
@@ -400,28 +305,21 @@ js点击文本
     ...    ${text} ：是元素标签之间的文本
     ...    ${index}：如果得到的是多个元素，输入所需元素的索引
     ${locator}    evaluate    'xpath://{}[contains(string(),"${text}")]'.format("${label}")
-    @{el}    判断元素个数并包含    ${locator}    ${index}
+    @{el}    等待元素出现    ${locator}    ${index}
     ${name}    evaluate    str(time.time()).replace('.','')    time
     Assign Id To Element    @{el}[${index}]    id_${name}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    execute javascript    document.querySelector('#id_${name}').click()
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    document.querySelector('#id_${name}').click()
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    execute javascript    document.querySelector('#id_${name}').click()
 
 js输入
     [Arguments]    ${locator}    ${text}    ${index}=0
-    [Documentation]    js定位只能使用css语法；
+    [Documentation]    js输入文本
     ...    参数${locator}:是定位；
     ...    参数${index}：是索引，当得到一组元素时候使用；
     ...    参数${text}：是输入的文本；
-    判断元素个数并包含    ${locator}    ${index}
-    ${css}    set variable    ${locator[4:]}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    execute javascript    document.querySelectorAll('${css}')[${index}].value='${text}'
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    document.querySelectorAll('${css}')[${index}].value='${text}'
+    等待元素出现    ${locator}    ${index}
+    ${name}    evaluate    str(time.time()).replace('.','')    time
+    Assign Id To Element    @{el}[${index}]    id_${name}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    execute javascript    document.querySelectorAll('#id_${name}')[${index}].value='${text}'
 
 js得到文本
     [Arguments]    ${label}    ${text}    ${index}=0
@@ -430,7 +328,7 @@ js得到文本
     ...    ${text} ：是元素标签之间的文本
     ...    ${index}：如果得到的是多个元素，输入所需元素的索引
     ${locator}    evaluate    'xpath://{}[contains(text(),"${text}")]'.format("${label}")
-    @{el}    判断元素个数并包含    ${locator}    ${index}
+    @{el}    等待元素出现    ${locator}    ${index}
     ${name}    evaluate    str(time.time()).replace('.','')    time
     Assign Id To Element    @{el}[${index}]    id_${name}
     : FOR    ${i}    IN RANGE    50
@@ -446,26 +344,18 @@ js上传
     [Documentation]    js上传文件
     ...    参数${file_path} ：是要上传文件的地址包括后缀名称
     ...    参数${index}：是索引，当得到一组元素时候使用；
-    @{el}    判断元素个数并包含    css:[type="file"]    ${index}
+    @{el}    等待元素出现    css:[type="file"]    ${index}
     execute javascript    document.querySelectorAll('[type="file"]')[${index}].style="display: true"
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    Choose File    @{el}[${index}]    ${file_path}
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    Choose File    @{el}[${index}]    ${file_path}
     execute javascript    document.querySelectorAll('[type="file"]')[${index}].style="display: none;"
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    Choose File    @{el}[${index}]    ${file_path}
 
 一般上传
     [Arguments]    ${locator}    ${file_path}    ${index}=0
     [Documentation]    1、参数${locator}：是上传框的定位
     ...    2、参数${file_path}：是要上传文件的路径
     ...    3、参数${index}是元素索引，当得到一组元素进行使用
-    @{el}    判断元素个数并包含    ${locator}    ${index}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    Choose File    @{el}[${index}]    ${file_path}
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    Choose File    @{el}[${index}]    ${file_path}
+    @{el}    等待元素出现    ${locator}    ${index}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    Choose File    @{el}[${index}]    ${file_path}
 
 div滚动条
     [Arguments]    ${locator}    ${number}    ${index}=0
@@ -474,28 +364,21 @@ div滚动条
     ...    参数${locator}:是定位；
     ...    参数${index}：是索引，当得到一组元素时候使用；
     ...    参数${number}：是滚动的位置 ，输入的值，例如：50；
-    判断元素个数并包含    ${locator}    ${index}
-    ${css}    set variable    ${locator[4:]}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    execute javascript    document.querySelectorAll('${css}')[${index}].scrollTop=${number}
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    document.querySelectorAll('${css}')[${index}].scrollTop=${number}
+    等待元素出现    ${locator}    ${index}
+    ${name}    evaluate    str(time.time()).replace('.','')    time
+    Assign Id To Element    @{el}[${index}]    id_${name}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    execute javascript    document.querySelectorAll('#id_${name} ')[${index}].scrollTop=${number}
 
 div滚动条left
     [Arguments]    ${locator}    ${number}    ${index}=0
     [Documentation]    默认左右移动div内嵌式hi滚动条；
-    ...    js定位是使用css定位
     ...    参数${locator}:是定位；
     ...    参数${number}：是滚动的位置 ，输入的值，例如：50；
     ...    参数${index}：是索引，当得到一组元素时候使用；
-    判断元素个数并包含    ${locator}    ${index}
-    ${css}    set variable    ${locator[4:]}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    execute javascript    document.querySelectorAll('${css}')[${index}].scrollLeft=${number}
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    execute javascript    document.querySelectorAll('${css}')[${index}].scrollLeft=${number}
+    等待元素出现    ${locator}    ${index}
+    ${name}    evaluate    str(time.time()).replace('.','')    time
+    Assign Id To Element    @{el}[${index}]    id_${name}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    execute javascript    document.querySelectorAll('#id_${name}')[${index}].scrollLeft=${number}
 
 滚动条
     [Arguments]    ${number}
@@ -513,12 +396,8 @@ div滚动条left
     [Documentation]    切换到frame框，参数${locator}：是定位方式；
     ...    如果有id和name的话直接写： 两个属性的值即可；
     ...    例如id=kw，name=su，直接写 kw或su即可
-    @{el}    判断元素个数并包含    ${locator}    ${index}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    select frame    @{el}[${index}]
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    select frame    @{el}[${index}]
+    @{el}    等待元素出现    ${locator}    ${index}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    select frame    @{el}[${index}]
 
 返回frame
     [Documentation]    返回主frame
@@ -564,12 +443,8 @@ div滚动条left
 
 回车
     [Arguments]    ${locator}    ${index}=0
-    @{el}    判断元素个数并包含    ${locator}    ${index}
-    : FOR    ${i}    IN RANGE    50
-    \    ${msg}    Run Keyword And Ignore Error    press key    @{el}[${index}]    \\13
-    \    Exit For Loop If    "${msg[0]}" == "PASS"
-    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
-    ...    ELSE IF    "${msg[0]}" == "FAIL"    press key    @{el}[${index}]    \\13
+    @{el}    等待元素出现    ${locator}    ${index}
+    BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    press key    @{el}[${index}]    \\13
 
 弹框确定
     #点击弹框中的确定
@@ -602,7 +477,7 @@ div滚动条left
     [Documentation]    参数${locator}：是定位 方式，例如：id=kw；
     ...    参数${name}：是要得到的属性名称；
     ...    ${index}是元素索引：当定位是一组元素时候使用；
-    @{el}    判断元素个数并包含    ${locator}    ${index}
+    @{el}    等待元素出现    ${locator}    ${index}
     Set Focus To Element    @{el}[${index}]
     ${atrr}    Selenium2Library.Get Element Attribute    @{el}[${index}]    ${name}
     [Return]    ${atrr}
@@ -687,11 +562,11 @@ json转换
 
 表格得到数据
     [Arguments]    ${locator}    ${row}    ${column}    ${index}=0
-    @{el}    判断元素个数并显示    ${locator}    ${index}
+    @{el}    等待元素出现    ${locator}    ${index}
     ${name}    evaluate    str(time.time()).replace('.','')    time
     Assign Id To Element    @{el}[${index}]    id_${name}
     wait until page contains element    css:#id_${name} tr:first-child td    30
-    Wait Until Element Is Visible    css:#id_${name} tr:first-child td    30
+    Comment    Wait Until Element Is Visible    css:#id_${name} tr:first-child td    30
     : FOR    ${i}    IN RANGE    50
     \    ${msg}    Run Keyword And Ignore Error    Get Table Cell    @{el}[${index}]    ${row}    ${column}
     \    Exit For Loop If    "${msg[0]}" == "PASS"
@@ -702,17 +577,17 @@ json转换
 
 表格得到大小和位置
     [Arguments]    ${locator}    ${text}    ${index}=0
-    @{el}    判断元素个数并包含    ${locator}    ${index}
-    ${name}    evaluate    str(time.time()).replace('.','')    time
-    Assign Id To Element    @{el}[${index}]    id_${name}
-    wait until page contains element    css:#id_${name} tbody tr:first-child td    30
-    ${row}    Execute Javascript    return document.querySelectorAll('#id_${name} tr').length
-    ${col}    Execute Javascript    return document.querySelectorAll('#id_${name} tbody tr:first-child td').length
+    @{el}    等待元素出现    ${locator}    ${index}
+    Comment    ${name}    evaluate    str(time.time()).replace('.','')    time
+    Assign Id To Element    @{el}[${index}]    table_demo_id
+    wait until page contains element    css:#table_demo_id tbody tr:first-child td    30
+    ${row}    Execute Javascript    return document.querySelectorAll('#table_demo_id \ tr').length
+    ${col}    Execute Javascript    return document.querySelectorAll('#table_demo_id \ tbody tr:first-child td').length
     @{msg}    create list    Table is a : \ ${row} row ${col} col
     @{demo_01}    create list    Your find text in Cell :
     BuiltIn.Set Global Variable    ${demo}    ${demo_01}
     : FOR    ${i}    IN RANGE    1    ${row}+1
-    \    表格数据    @{el}[${index}]    ${i}    ${col}    ${text}
+    \    Run Keyword And Ignore Error    表格数据    @{el}[${index}]    ${i}    ${col}    ${text}
     Append To List    ${msg}    ${demo}
     log    ${msg}
     [Return]    ${msg}
@@ -721,4 +596,9 @@ json转换
     [Arguments]    ${locator}    ${i}    ${col}    ${text}
     : FOR    ${j}    IN RANGE    1    ${col}+1
     \    ${msg}    Selenium2Library . Get Table Cell    ${locator}    ${i}    ${j}
-    \    run keyword if    '''${text}''' in '''${msg}'''    Append To List    ${demo}    [${i},${j}]
+    \    ${x}    BuiltIn.Evaluate    [${i},${j}]
+    \    run keyword if    '''${text}''' in '''${msg}'''    Append To List    ${demo}    ${x}
+
+表格输入文本
+    [Arguments]    ${row}    ${col}    ${text}
+    输入文本    css:#table_demo_id tbody tr:nth-child(${row}) > td:nth-child(${col}) input    ${text}    #给固定的表格输入数据
