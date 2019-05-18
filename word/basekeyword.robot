@@ -38,10 +38,14 @@ Library           AutoItLibrary
 Win_Kill
     [Documentation]    Window环境中运行完毕后关闭浏览器 的驱动 （ie和谷歌）
     Close All Browsers
-    evaluate    os.system('taskkill /f /im IEDriverServer.exe')    os
-    evaluate    os.system('taskkill /f /im chromedriver.exe')    os
-    evaluate    os.system('taskkill /f /im geckodriver.exe')    os
-    evaluate    os.system('taskkill /f /im MicrosoftWebDriver.exe')    os
+    evaluate    os.system('taskkill /f /im IEDriverServer.exe')    os    #关闭IE驱动
+    evaluate    os.system('taskkill /f /im chromedriver.exe')    os    #关闭谷歌驱动
+    evaluate    os.system('taskkill /f /im geckodriver.exe')    os    #关闭火狐驱动
+    evaluate    os.system('taskkill /f /im MicrosoftWebDriver.exe')    os    #关闭edge驱动
+    evaluate    os.system('taskkill /f /im operadriver.exe')    os    #关闭opera驱动
+    evaluate    os.system('taskkill /f /im 360chromedriver.exe')    os    #关闭360驱动
+    evaluate    os.system('taskkill /f /im 360sechromedriver.exe')    os    #关闭360se驱动
+    evaluate    os.system('taskkill /f /im 360se.exe')    os    #关闭360浏览器
 
 Linux_Kill
     [Documentation]    Linux环境中运行完毕后关闭谷歌浏览器的驱动
