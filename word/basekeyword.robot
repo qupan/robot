@@ -1,5 +1,5 @@
 *** Settings ***
-Library           Selenium2Library
+Library           Selenium2Library    timeout=30
 Library           DateTime
 Library           Collections
 Library           String
@@ -41,11 +41,6 @@ Win_Kill
     evaluate    os.system('taskkill /f /im IEDriverServer.exe')    os    #关闭IE驱动
     evaluate    os.system('taskkill /f /im chromedriver.exe')    os    #关闭谷歌驱动
     evaluate    os.system('taskkill /f /im geckodriver.exe')    os    #关闭火狐驱动
-    evaluate    os.system('taskkill /f /im MicrosoftWebDriver.exe')    os    #关闭edge驱动
-    evaluate    os.system('taskkill /f /im operadriver.exe')    os    #关闭opera驱动
-    evaluate    os.system('taskkill /f /im 360chromedriver.exe')    os    #关闭360驱动
-    evaluate    os.system('taskkill /f /im 360sechromedriver.exe')    os    #关闭360se驱动
-    evaluate    os.system('taskkill /f /im 360se.exe')    os    #关闭360浏览器
 
 Linux_Kill
     [Documentation]    Linux环境中运行完毕后关闭谷歌浏览器的驱动
@@ -254,7 +249,7 @@ jq点击
     [Documentation]    使用jquery进行点击
     ...    参数${locator}:是定位；
     ...    参数${index}：是索引，当得到一组元素时候使用；
-    等待元素出现    ${locator}    ${index}
+    @{el}    等待元素出现    ${locator}    ${index}
     ${name}    evaluate    str(time.time()).replace('.','')    time
     Assign Id To Element    @{el}[${index}]    id_${name}
     BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    execute javascript    $('#id_${name}').eq(${index}).click()
@@ -276,7 +271,7 @@ jq双击
     [Documentation]    使用jquery点击
     ...    参数${locator}:是定位；
     ...    参数${index}：是索引，当得到一组元素时候使用；
-    等待元素出现    ${locator}    ${index}
+    @{el}    等待元素出现    ${locator}    ${index}
     ${name}    evaluate    str(time.time()).replace('.','')    time
     Assign Id To Element    @{el}[${index}]    id_${name}
     BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    execute javascript    $('#id_${name}').eq(${index}).dblclick()
@@ -287,7 +282,7 @@ jq输入
     ...    参数${locator}:是定位；
     ...    参数${index}：是索引，当得到一组元素时候使用；
     ...    参数${text}：是要输入的文本
-    等待元素出现    ${locator}    ${index}
+    @{el}    等待元素出现    ${locator}    ${index}
     ${name}    evaluate    str(time.time()).replace('.','')    time
     Assign Id To Element    @{el}[${index}]    id_${name}
     BuiltIn.Wait Until Keyword Succeeds    30 s    2 s    execute javascript    $('#id_${name}').eq(${index}).val('${text}')
