@@ -28,3 +28,7 @@ mac  ：https://blog.csdn.net/wangshaohui112/article/details/80916647
 
 常用模拟器端口号
 https://blog.csdn.net/u013383596/article/details/84561036
+
+
+欧鹏在robot framework中不能打开问题
+https://github.com/robotframework/SeleniumLibrary/issues/1072
