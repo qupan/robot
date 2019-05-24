@@ -63,8 +63,62 @@ Linux_Kill
     ...    火狐浏览器 --- ff
     ...    谷歌后台模式 --- headlesschrome
     ...    火狐后台模式 --- headlessfirefox
+    ...    欧鹏浏览器 --- opera
+    ...    360极速浏览器 --- 360
+    ...    360安全浏览器 --- 360se
     Append To Environment Variable    PATH    /usr/local/bin
-    open browser    ${url}    ${browser}
+    RUN KEYWORD IF    '${browser}' == '360'    360极速浏览器    ${url}
+    ...    ELSE IF    '${browser}' == '360se'    360安全浏览器    ${url}
+    ...    ELSE IF    '${browser}' == 'opera'    opera浏览器    ${url}
+    ...    ELSE    open browser    ${url}    ${browser}
+    Maximize Browser Window
+    reload page
+
+opera浏览器
+    [Arguments]    ${url}
+    [Documentation]    添加环境变量：
+    ...    1、新建系统变量：OPERA，值为360极速浏览器的路径：C:\Users\pan.qu\AppData\Local\Programs\Opera
+    ...    2、在Path中添加值：%OPERA%
+    ${options}    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys
+    BuiltIn.Call Method    ${options}    add_argument    disable-infobars
+    ${path}    Evaluate    os.path.join(os.getenv('OPERA'),'opera.exe')    os
+    ${options.binary_location}    Set Variable    ${path}
+    Selenium2Library.Create Webdriver    Opera    options=${options}
+    Selenium2Library.Go To    ${url}
+    Maximize Browser Window
+    reload page
+
+360极速浏览器
+    [Arguments]    ${url}
+    [Documentation]    添加环境变量：
+    ...    1、新建系统变量：FAST，值为360极速浏览器的路径：C:\Users\pan.qu\AppData\Local\360Chrome\Chrome
+    ...    2、在Path中添加值：%FAST%
+    ${options}    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys
+    BuiltIn.Call Method    ${options}    add_argument    disable-infobars
+    ${path}    Evaluate    os.path.join(os.getenv('FAST'),'Application','360chrome.exe')    os    #得到360极速浏览器的地址
+    ${user_data_path}    Evaluate    os.path.join(os.getenv('FAST'),'User Data')    os    #得到360数据的地址
+    ${user_data}    Set Variable    user-data-dir=${user_data_path}    #对地址重新赋值
+    BuiltIn.Call Method    ${options}    add_argument    ${user_data}
+    ${options.binary_location}    Set Variable    ${path}
+    ${executable_path}    Set Variable    360chromedriver.exe
+    Selenium2Library.Create Webdriver    Chrome    executable_path=${executable_path}    options=${options}
+    Selenium2Library.Go To    ${url}
+    reload page
+    Maximize Browser Window
+    reload page
+
+360安全浏览器
+    [Arguments]    ${url}
+    [Documentation]    添加环境变量：
+    ...    1、新建系统变量：SAFETY，值为360安全浏览器的路径：C:\Users\pan.qu\AppData\Roaming\360se6\Application
+    ...    2、在Path中添加值：%SAFETY%
+    ${options}    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys
+    BuiltIn.Call Method    ${options}    add_argument    disable-infobars
+    ${path}    Evaluate    os.path.join(os.getenv('SAFETY'),'360se.exe')    os    #得到360安全浏览器的地址
+    ${options.binary_location}    Set Variable    ${path}
+    ${executable_path}    Set Variable    360sechromedriver.exe
+    Selenium2Library.Create Webdriver    Chrome    executable_path=${executable_path}    options=${options}
+    Selenium2Library.Go To    ${url}
     Maximize Browser Window
     reload page
 
