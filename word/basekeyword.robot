@@ -32,22 +32,17 @@ Library           AutoItLibrary
     [Documentation]    退出驱动，自动判断是Window还是Linux环境
     ...    关闭：谷歌、IE、火狐的驱动，防止驱动未关出现问题
     ${addr}    Evaluate    type(pathlib2.Path())    pathlib2
-    Run Keyword If    "${addr}" == "<class 'pathlib2.WindowsPath'>"    Win_Kill
-    Run Keyword If    "${addr}" == "<class 'pathlib2.PosixPath'>"    Linux_Kill
+    Run Keyword If    "${addr}" == "<class 'pathlib2.WindowsPath'>"    Win关闭
+    Run Keyword If    "${addr}" == "<class 'pathlib2.PosixPath'>"    Linux关闭
 
-Win_Kill
+Win关闭
     [Documentation]    Window环境中运行完毕后关闭浏览器 的驱动 （ie和谷歌）
     Close All Browsers
     evaluate    os.system('taskkill /f /im IEDriverServer.exe')    os    #关闭IE驱动
     evaluate    os.system('taskkill /f /im chromedriver.exe')    os    #关闭谷歌驱动
     evaluate    os.system('taskkill /f /im geckodriver.exe')    os    #关闭火狐驱动
-    evaluate    os.system('taskkill /f /im MicrosoftWebDriver.exe')    os    #关闭edge驱动
-    evaluate    os.system('taskkill /f /im operadriver.exe')    os    #关闭opera驱动
-    evaluate    os.system('taskkill /f /im 360chromedriver.exe')    os    #关闭360驱动
-    evaluate    os.system('taskkill /f /im 360sechromedriver.exe')    os    #关闭360se驱动
-    evaluate    os.system('taskkill /f /im 360se.exe')    os    #关闭360浏览器
 
-Linux_Kill
+Linux关闭
     [Documentation]    Linux环境中运行完毕后关闭谷歌浏览器的驱动
     Close All Browsers
     evaluate    os.system('killall chrome')    os
@@ -63,62 +58,8 @@ Linux_Kill
     ...    火狐浏览器 --- ff
     ...    谷歌后台模式 --- headlesschrome
     ...    火狐后台模式 --- headlessfirefox
-    ...    欧鹏浏览器 --- opera
-    ...    360极速浏览器 --- 360
-    ...    360安全浏览器 --- 360se
     Append To Environment Variable    PATH    /usr/local/bin
-    RUN KEYWORD IF    '${browser}' == '360'    360极速浏览器    ${url}
-    ...    ELSE IF    '${browser}' == '360se'    360安全浏览器    ${url}
-    ...    ELSE IF    '${browser}' == 'opera'    opera浏览器    ${url}
-    ...    ELSE    open browser    ${url}    ${browser}
-    Maximize Browser Window
-    reload page
-
-opera浏览器
-    [Arguments]    ${url}
-    [Documentation]    添加环境变量：
-    ...    1、新建系统变量：OPERA，值为360极速浏览器的路径：C:\Users\pan.qu\AppData\Local\Programs\Opera
-    ...    2、在Path中添加值：%OPERA%
-    ${options}    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys
-    BuiltIn.Call Method    ${options}    add_argument    disable-infobars
-    ${path}    Evaluate    os.path.join(os.getenv('OPERA'),'opera.exe')    os
-    ${options.binary_location}    Set Variable    ${path}
-    Selenium2Library.Create Webdriver    Opera    options=${options}
-    Selenium2Library.Go To    ${url}
-    Maximize Browser Window
-    reload page
-
-360极速浏览器
-    [Arguments]    ${url}
-    [Documentation]    添加环境变量：
-    ...    1、新建系统变量：FAST，值为360极速浏览器的路径：C:\Users\pan.qu\AppData\Local\360Chrome\Chrome
-    ...    2、在Path中添加值：%FAST%
-    ${options}    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys
-    BuiltIn.Call Method    ${options}    add_argument    disable-infobars
-    ${path}    Evaluate    os.path.join(os.getenv('FAST'),'Application','360chrome.exe')    os    #得到360极速浏览器的地址
-    ${user_data_path}    Evaluate    os.path.join(os.getenv('FAST'),'User Data')    os    #得到360数据的地址
-    ${user_data}    Set Variable    user-data-dir=${user_data_path}    #对地址重新赋值
-    BuiltIn.Call Method    ${options}    add_argument    ${user_data}
-    ${options.binary_location}    Set Variable    ${path}
-    ${executable_path}    Set Variable    360chromedriver.exe
-    Selenium2Library.Create Webdriver    Chrome    executable_path=${executable_path}    options=${options}
-    Selenium2Library.Go To    ${url}
-    reload page
-    Maximize Browser Window
-    reload page
-
-360安全浏览器
-    [Arguments]    ${url}
-    [Documentation]    添加环境变量：
-    ...    1、新建系统变量：SAFETY，值为360安全浏览器的路径：C:\Users\pan.qu\AppData\Roaming\360se6\Application
-    ...    2、在Path中添加值：%SAFETY%
-    ${options}    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys
-    BuiltIn.Call Method    ${options}    add_argument    disable-infobars
-    ${path}    Evaluate    os.path.join(os.getenv('SAFETY'),'360se.exe')    os    #得到360安全浏览器的地址
-    ${options.binary_location}    Set Variable    ${path}
-    ${executable_path}    Set Variable    360sechromedriver.exe
-    Selenium2Library.Create Webdriver    Chrome    executable_path=${executable_path}    options=${options}
-    Selenium2Library.Go To    ${url}
+    open browser    ${url}    ${browser}
     Maximize Browser Window
     reload page
 
@@ -488,7 +429,7 @@ div滚动条left
     [Arguments]    ${list_01}    ${locator}
     : FOR    ${j}    IN RANGE    3
     \    #log    ${j}
-    \    RUN KEYWORD IF    "${list_01[${j}]}" == "${locator}"    select window    ${list_01[0]}
+    \    RUN KEYWORD IF    "${locator}" in "${list_01[${j}]}"    select window    ${list_01[0]}
 
 关闭窗口
     close window
