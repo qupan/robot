@@ -17,6 +17,9 @@ Library           AutoItLibrary
 *** Keywords ***
 等待元素出现
     [Arguments]    ${locator}    ${index}=0
+    ${locator}    BuiltIn.Run Keyword If    '//' in '${locator}'    BuiltIn.Set Variable    xpath:${locator}
+    ...    ELSE IF    '/' in '${locator}'    BuiltIn.Set Variable    xpath:${locator}
+    ...    ELSE    BuiltIn.Set Variable    css:${locator[1:-1]}
     ${number}    evaluate    ${index}+1
     : FOR    ${i}    IN RANGE    50
     \    wait until page contains element    ${locator}    30    page not contains element
