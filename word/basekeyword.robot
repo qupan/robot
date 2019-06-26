@@ -17,8 +17,8 @@ Library           AutoItLibrary
 *** Keywords ***
 等待元素出现
     [Arguments]    ${locator}    ${index}=0
-    ${locator}    BuiltIn.Run Keyword If    '//' in '${locator}'    BuiltIn.Set Variable    ${locator}
-    ...    ELSE IF    '/' in '${locator}'    BuiltIn.Set Variable    ${locator}
+    ${result}    evaluate    ['xpath' if ('//' in ${locator}) or ('/' in ${locator}) else 'css'][0]
+    ${locator}    BuiltIn.Run Keyword If    "${result}" == "xpath"    BuiltIn.Set Variable    ${locator}
     ...    ELSE    BuiltIn.Set Variable    css:${locator[1:-1]}
     ${number}    evaluate    ${index}+1
     : FOR    ${i}    IN RANGE    50
