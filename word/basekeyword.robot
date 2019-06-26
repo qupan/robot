@@ -239,6 +239,19 @@ canvas输入文本
     ...    ELSE IF    "${msg[0]}" == "FAIL"    BuiltIn.Should Not Be Empty    ${text}
     [Return]    ${text}
 
+得到输入框文本
+    [Arguments]    ${locator}    ${index}=0
+    [Documentation]    得到页面元素的文本；
+    ...    参数${locator}是元素的定位
+    @{el}    等待元素出现    ${locator}    ${index}
+    : FOR    ${i}    IN RANGE    50
+    \    ${text}    Get Value    @{el}[${index}]
+    \    ${msg}    Run Keyword And Ignore Error    BuiltIn.Should Not Be Empty    ${text}
+    \    Exit For Loop If    "${msg[0]}" == "PASS"
+    RUN KEYWORD IF    "${msg[0]}" == "PASS"    set variable    ${True}
+    ...    ELSE IF    "${msg[0]}" == "FAIL"    BuiltIn.Should Not Be Empty    ${text}
+    [Return]    ${text}
+
 移动滑块
     [Arguments]    ${locator}    ${index}=0
     [Documentation]    移动验证滑块。
