@@ -53,3 +53,7 @@ windows各个模拟器常用端口号：
 MAC各个模拟器常用端口号：
   夜神模拟器	62001
   网易MUMU模拟器	5555
+  
+ 查看Android应用包名、Activity的方法：
+ aapt dump badging E:\apk\es3.apk |findstr "package"
+ aapt dump badging E:\apk\es3.apk |findstr "activity"
