@@ -32,3 +32,26 @@ https://blog.csdn.net/u013383596/article/details/84561036
 
 欧鹏在robot framework中不能打开问题
 https://github.com/robotframework/SeleniumLibrary/issues/1072
+
+adb连接浏览：
+在\Nemu\vmonitor\bin中，运行命令行adb connect 127.0.0.1:7555
+
+常用模拟器端口号
+windows各个模拟器常用端口号：
+
+  模拟器名称	端口号
+  真机	5555
+  逍遥游	21503
+  夜神模拟器	62001
+  海马玩模拟器	26944
+  网易mumu模拟器	7555
+  天天模拟器	6555
+  BlueStacks	5555
+  天天安卓模拟器	5037
+  安卓模拟器大师	54001
+  Genymotion	5555
+
+MAC各个模拟器常用端口号：
+  模拟器名称	端口号
+  夜神模拟器	62001
+  网易MUMU模拟器	5555
