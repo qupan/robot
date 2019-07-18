@@ -57,3 +57,6 @@ MAC各个模拟器常用端口号：
  查看Android应用包名、Activity的方法：
  aapt dump badging E:\apk\es3.apk |findstr "package"
  aapt dump badging E:\apk\es3.apk |findstr "activity"
+
+wps取消登陆弹框
+https://zhidao.baidu.com/question/2056085739362501187.html
