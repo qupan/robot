@@ -132,6 +132,7 @@ canvas输入文本
     ...    、距离左边画板的距离，距离上边画板的距离，
     ...    如果canvas不是唯一定位，传入4个参数【1，150,10,100】
     ...    ，第一个参数为要操作元素的索引值，后3个和上面相同
+    ...     http://www.17sucai.com/pins/demo-show?id=27315
     ${x}    得到长度    ${size}
     ${index}    BuiltIn.Run Keyword If    ${x} == 3    BuiltIn.Set Variable    0
     ...    ELSE IF    ${x} == 4    BuiltIn.Set Variable    @{size}[0]
